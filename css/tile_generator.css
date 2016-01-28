@@ -1,0 +1,56 @@
+.canvases {
+    float: left;
+}
+
+.canvases .title {
+
+}
+
+.canvases canvas {
+
+}
+
+.canvases .canvas-container-template {
+    display: none;
+}
+
+.canvases .canvas-container p {
+    margin-top: 0;
+    font-weight: bold;
+}
+
+.controls {
+    float: left;
+    margin-left: 20px;
+}
+
+.controls .color-container-template {
+    display: none;
+}
+
+.controls .colors {
+    margin-top: 10px;
+}
+
+.controls .colors .color-container:not(:first-child) {
+    margin-top: 20px;
+}
+
+.controls .colors .color-container .color-weight-label {
+    margin-left: 5px;
+}
+
+.controls .colors .color-container .color-weight-range {
+    margin: 0;
+    padding: 0;
+    width: 75px;
+    vertical-align: middle;
+}
+
+.controls .colors .color-container .color-weight-value {
+    margin-left: 5px;
+}
+
+.controls .colors .color-container .remove-color-btn {
+    margin-left: 10px;
+}

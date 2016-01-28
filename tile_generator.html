@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Tile Generator</title>
+        <link rel="stylesheet" type="text/css" href="css/tile_generator.css">
+        <script src="build/tile_generator.js"></script>
+    </head>
+    <body>
+      <div id="canvases" class="canvases">
+          <div id="canvas-container-template" class="canvas-container-template">
+              <p class="title"></p>
+              <canvas></canvas>
+          </div>
+      </div>
+      <div id="controls" class="controls">
+          <div class="new-color">
+              <button id="new-color-btn" type="button">Add Color</button>
+              <button id="redraw-btn" type="button">Redraw</button>
+          </div>
+          <div class="size">
+            <label for="width" class="width-label">Width:</label> <input type="text" size="3" maxlength="3" id="width" class="width">
+            <label for="height" class="height-label">Height:</label> <input type="text" size="3" maxlength="3" id="height" class="height">
+          </div>
+          <div id="colors" class="colors"></div>
+          <div id="color-container-template" class="color-container-template">
+            <input type="color" value="#000000" class="color">
+            <input type="text" value="#000000" size="7" maxlength="7" class="color-value">
+            <label for="color-weight-range" class="color-weight-label">Weight:</label>
+            <input type="range" min="0" max="100" step="1" value="100" class="color-weight-range">
+            <span class="color-weight-value">100</span>
+            <button type="button" class="remove-color-btn">Remove</button>
+          </div>
+      </div>
+    </body>
+</html>

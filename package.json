@@ -1,0 +1,21 @@
+{
+  "name": "tilegenerator",
+  "version": "0.1.0",
+  "description": "Browser app for creating simple tile sprites.",
+  "license:": "MIT",
+  "author": {
+    "name": "Joe Ridino",
+    "email": "joe.ridino@gmail.com",
+    "url": "https://jridino.github.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jridino/TileGenerator"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-util": "^3.0.7",
+    "gulp-uglify": "^1.5.1"
+  }
+}
