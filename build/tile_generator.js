@@ -148,13 +148,17 @@ var TileGenerator = {};
     }
 
     TileGenerator.Settings.prototype._saveSettings = function () {
-        var settings = JSON.stringify({
-            width: this._width,
-            height: this._height,
-            colors: this._colors,
-            colorWeights: this._colorWeights
-        });
-        window.localStorage.setItem('settings', settings);
+        var settings;
+        try {
+            var settings = JSON.stringify({
+                width: this._width,
+                height: this._height,
+                colors: this._colors,
+                colorWeights: this._colorWeights
+            });
+            window.localStorage.setItem('settings', settings);
+        } catch (e) {
+        }
     };
 }());
 (function () {
