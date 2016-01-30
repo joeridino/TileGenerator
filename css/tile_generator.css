@@ -1,5 +1,8 @@
+.clearfix {
+    clear: both;
+}
+
 .canvases {
-    float: left;
 }
 
 .canvases .title {
@@ -14,26 +17,56 @@
     display: none;
 }
 
+.canvases .canvas-container {
+    float: left;
+}
+
+.canvases .canvas-container:not(:last-of-type) {
+    margin-right: 10px;
+}
+
 .canvases .canvas-container p {
+    display: none;
     margin-top: 0;
     font-weight: bold;
 }
 
 .controls {
-    float: left;
-    margin-left: 20px;
+    clear: both;
+    margin-top: 20px;
 }
 
 .controls .color-container-template {
     display: none;
 }
 
+.controls .new-color {
+    margin-top: 20px;
+}
+
+.controls .new-color button:not(:first-of-type) {
+    margin-left: 10px;
+}
+
+.controls .size,
 .controls .colors {
-    margin-top: 10px;
+    margin-top: 20px;
+}
+
+.controls .size label:not(:first-of-type) {
+    margin-left: 10px;
 }
 
 .controls .colors .color-container:not(:first-child) {
     margin-top: 20px;
+}
+
+.controls .colors .color-container .color-combo {
+    display: inline-block;
+}
+
+.controls .colors .color-container .color-weight-combo {
+    display: inline-block;
 }
 
 .controls .colors .color-container .color-weight-label {
@@ -48,9 +81,26 @@
 }
 
 .controls .colors .color-container .color-weight-value {
+    display: inline-block;
     margin-left: 5px;
+    min-width: 30px;
 }
 
 .controls .colors .color-container .remove-color-btn {
     margin-left: 10px;
+}
+
+@media (max-width: 440px) {
+    .controls .colors .color-container .color-weight-combo {
+        clear: both;
+        display: block;
+    }
+
+    .controls .colors .color-container .color-weight-label {
+        margin-left: 0px;
+    }
+
+    .controls .colors .color-container .remove-color-btn {
+        margin-left: 0px;
+    }
 }

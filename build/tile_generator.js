@@ -166,9 +166,9 @@ var TileGenerator = {};
 
     TileGenerator.Ui.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
-        this._canvasesElement = document.getElementById('canvases');
+        this._canvasesElement = document.getElementById('canvases-dynamic');
         this._canvasContainerTplElement = document.getElementById('canvas-container-template');
-        this._colorsElement = document.getElementById('colors');
+        this._colorsElement = document.getElementById('colors-dynamic');
         this._newColorElement = document.getElementById('new-color-btn');
         this._newColorElement.addEventListener('click', this._onAddColor.bind(this));
         this._colorContainerTplElement = document.getElementById('color-container-template');
@@ -190,14 +190,16 @@ var TileGenerator = {};
             ctx,
             deep = true,
             algoId = algo.getId(),
+            title = algo.getTitle(),
             tpl;
         tpl = this._canvasContainerTplElement.cloneNode(deep);
         tpl.removeAttribute('id');
         tpl.setAttribute('class', 'canvas-container');
-        tpl.querySelector('.title').textContent = algo.getTitle();
+        tpl.querySelector('.title').textContent = title;
         canvas = tpl.querySelector('canvas');
         canvas.width = this._settings.getWidth();
         canvas.height = this._settings.getHeight();
+        canvas.setAttribute('title', title);
         ctx = canvas.getContext('2d');
         this._canvasList[algoId] = canvas;
         this._ctxList[algoId] = ctx;
