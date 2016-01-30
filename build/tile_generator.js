@@ -45,8 +45,8 @@ var TileGenerator = {};
     'use strict';
 
     TileGenerator.Settings = function () {
-        this._width = 64;
-        this._height = 64;
+        this._width = 96;
+        this._height = 96;
         this._colors = [
             '#ff0000',
             '#00ff00',
@@ -60,19 +60,19 @@ var TileGenerator = {};
     };
 
     TileGenerator.Settings.prototype.onLoad = function () {
-        // TODO: COMPLETE ME
-        var colors = window.localStorage.getItem('colors'),
-            colorWeights = window.localStorage.getItem('color_weights');
+        var settings;
         try {
-            if (colors) {
-                this._colors = JSON.parse(colors);
-            }
-            if (colorWeights) {
-                this._colorWeights = JSON.parse(colorWeights);
+            settings = window.localStorage.getItem('settings');
+            if (settings) {
+                settings = JSON.parse(settings);
+                this._width = settings.width;
+                this._height = settings.height;
+                this._colors = settings.colors;
+                this._colorWeights = settings.colorWeights;
             }
         } catch (e) {
-
         }
+        window.addEventListener('beforeunload', this._saveSettings.bind(this));
     };
 
     TileGenerator.Settings.prototype.getWidth = function () {
@@ -146,6 +146,16 @@ var TileGenerator = {};
         this._colorWeights.splice(index, 1);
         return this;
     }
+
+    TileGenerator.Settings.prototype._saveSettings = function () {
+        var settings = JSON.stringify({
+            width: this._width,
+            height: this._height,
+            colors: this._colors,
+            colorWeights: this._colorWeights
+        });
+        window.localStorage.setItem('settings', settings);
+    };
 }());
 (function () {
     'use strict';
