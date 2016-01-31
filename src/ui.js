@@ -66,10 +66,10 @@
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
-        var color = this._colorContainerTplElement.querySelector('.color').value,
+        var simpleColor = this._colorContainerTplElement.querySelector('.color').value,
             colorWeight = parseInt(this._colorContainerTplElement.querySelector('.color-weight-range').value, 10);
-        this._addColorToDom(color, colorWeight);
-        this._settings.addColor(color)
+        this._addColorToDom(simpleColor, colorWeight);
+        this._settings.addColor(TileGenerator.Hex.simpleToDecArray(simpleColor))
             .addColorWeight(colorWeight);
         this._redraw();
     };
@@ -93,7 +93,7 @@
         var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container'),
             index;
         index = this._getSiblingIndex(colorContainerElement);
-        this._settings.updateColor(index, e.target.value);
+        this._settings.updateColor(index, TileGenerator.Hex.simpleToDecArray(e.target.value));
         colorContainerElement.querySelector('.color-value').value = e.target.value;
         this._redraw();
     };
@@ -102,7 +102,7 @@
         var colorContainerElement,
             colorElement,
             eventObj;
-        if (this._isValidColor(e.target.value)) {
+        if (TileGenerator.Hex.isSimpleHex(e.target.value)) {
             colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
             colorElement = colorContainerElement.querySelector('.color');
             colorElement.value = e.target.value;
@@ -114,7 +114,7 @@
     TileGenerator.Ui.prototype._onChangeColorValue = function (e) {
         var colorContainerElement,
             colorElement;
-        if (!this._isValidColor(e.target.value)) {
+        if (!TileGenerator.Hex.isSimpleHex(e.target.value)) {
             colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
             colorElement = colorContainerElement.querySelector('.color');
             e.target.value = colorElement.value;
@@ -174,7 +174,7 @@
         TileGenerator.Main.getRef().draw();
     };
 
-    TileGenerator.Ui.prototype._addColorToDom = function (color, colorWeight) {
+    TileGenerator.Ui.prototype._addColorToDom = function (simpleColor, colorWeight) {
         var colorElement,
             colorValueElement,
             colorWeightElement,
@@ -188,8 +188,8 @@
         colorValueElement = tpl.querySelector('.color-value');
         colorWeightElement = tpl.querySelector('.color-weight-range');
         colorWeightValueElement = tpl.querySelector('.color-weight-value');
-        colorElement.value = color;
-        colorValueElement.value = color;
+        colorElement.value = simpleColor;
+        colorValueElement.value = simpleColor;
         colorWeightElement.value = colorWeight;
         colorWeightValueElement.textContent = colorWeight;
         tpl.querySelector('.remove-color-btn').addEventListener('click', this._onRemoveColor.bind(this));
@@ -208,7 +208,7 @@
         colors = this._settings.getColors();
         colorWeights = this._settings.getColorWeights();
         for (i = 0; i < colors.length; i += 1) {
-            this._addColorToDom(colors[i], colorWeights[i]);
+            this._addColorToDom(TileGenerator.Dec.decArrayToSimpleHex(colors[i]), colorWeights[i]);
         }
     };
 
@@ -227,10 +227,6 @@
             index += 1;
         }
         return index;
-    };
-
-    TileGenerator.Ui.prototype._isValidColor = function (value) {
-        return /^#([0-9a-f]{2}){3}$/i.test(value);
     };
 
     TileGenerator.Ui.prototype._parseSize = function (value) {

@@ -21,7 +21,6 @@
             len -= 1;
         }
     };
-
     TileGenerator.Util.getRandomWeightedIndex = function (a) {
         var dataArraySum = 0,
             i,

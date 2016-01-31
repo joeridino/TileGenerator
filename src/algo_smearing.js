@@ -11,11 +11,13 @@
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoSmearing);
 
-    TileGenerator.AlgoSmearing.prototype.draw = function (ctx) {
+    TileGenerator.AlgoSmearing.prototype._setPixels = function (ctx) {
         var colorIndex,
             colors = this._settings.getColors(),
             colorWeights = this._settings.getColorWeights(),
+            colorContinueBaseAmount = 5,
             colorContinueCount = 0,
+            colorContinueRandAmount = 20,
             needColorChange = true,
             position = {},
             x,
@@ -28,12 +30,12 @@
                     needColorChange = false;
                 }
                 colorContinueCount += 1;
-                if (colorContinueCount > (5 + Math.random() * 20)) {
+                if (colorContinueCount > (colorContinueBaseAmount + Math.random() * colorContinueRandAmount)) {
                     needColorChange = true;
                 }
                 position.x = x;
                 position.y = y;
-                this._drawPixel(ctx, position, colors[colorIndex]);
+                this._setPixel(ctx, position, colors[colorIndex]);
             }
         }
     };

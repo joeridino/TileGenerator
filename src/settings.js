@@ -5,9 +5,9 @@
         this._width = 96;
         this._height = 96;
         this._colors = [
-            '#ff0000',
-            '#00ff00',
-            '#0000ff'
+            [255, 0, 0],
+            [0, 255, 0],
+            [0, 0, 255]
         ];
         this._colorWeights = [
             100,
@@ -15,6 +15,8 @@
             100
         ];
     };
+
+    TileGenerator.Settings.VERSION = '1.1';
 
     TileGenerator.Settings.prototype.onLoad = function () {
         var settings;
@@ -24,7 +26,14 @@
                 settings = JSON.parse(settings);
                 this._width = settings.width;
                 this._height = settings.height;
-                this._colors = settings.colors;
+                if (!settings.version) {
+                    // Old settings that didn't have a version number stored
+                    // the colors as #ff00ff instead of [255, 0, 255].
+                    // We convert those old color hex values to dec arrays here.
+                    this._colors = this._convertHexColors(settings.colors);
+                } else {
+                    this._colors = settings.colors;
+                }
                 this._colorWeights = settings.colorWeights;
             }
         } catch (e) {
@@ -108,6 +117,7 @@
         var settings;
         try {
             var settings = JSON.stringify({
+                version: TileGenerator.Settings.VERSION,
                 width: this._width,
                 height: this._height,
                 colors: this._colors,
@@ -116,5 +126,14 @@
             window.localStorage.setItem('settings', settings);
         } catch (e) {
         }
+    };
+
+    TileGenerator.Settings.prototype._convertHexColors = function (hexColors) {
+        var colors = [],
+            i;
+        for (i = 0; i < hexColors.length; i += 1) {
+            colors.push(TileGenerator.Hex.simpleToDecArray(hexColors[i]));
+        }
+        return colors;
     };
 }());

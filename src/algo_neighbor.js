@@ -9,7 +9,7 @@
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor);
 
-    TileGenerator.AlgoNeighbor.prototype.draw = function (ctx) {
+    TileGenerator.AlgoNeighbor.prototype._setPixels = function (ctx) {
         var colorIndex,
             colors = this._settings.getColors(),
             colorWeights = this._settings.getColorWeights(),
@@ -51,7 +51,7 @@
                 pixelColorIndices[y][x] = colorIndex;
                 position.x = x;
                 position.y = y;
-                this._drawPixel(ctx, position, colors[colorIndex]);
+                this._setPixel(ctx, position, colors[colorIndex]);
             }
         }
     };

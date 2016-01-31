@@ -14,12 +14,15 @@
     };
 
     TileGenerator.Main.prototype.onLoad = function () {
-        var i;
+        var ctx,
+            i;
         this._settings.onLoad();
         this._ui.onLoad();
         this._algos = TileGenerator.AlgoFactory.getAlgoInstances();
         for (i = 0; i < this._algos.length; i += 1) {
             this._ui.addAlgoToDom(this._algos[i]);
+            ctx = this._ui.getCtx(this._algos[i]);
+            this._algos[i].setup(ctx);
         }
     };
 

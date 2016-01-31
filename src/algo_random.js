@@ -6,12 +6,12 @@
     TileGenerator.AlgoRandom = function (settings) {
         parent.call(this, settings);
         this._id = 'random';
-        this._title = 'Random Pixels';
+        this._title = 'Random';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoRandom);
 
-    TileGenerator.AlgoRandom.prototype.draw = function (ctx) {
+    TileGenerator.AlgoRandom.prototype._setPixels = function (ctx) {
         var colorIndex,
             colors = this._settings.getColors(),
             colorWeights = this._settings.getColorWeights(),
@@ -23,7 +23,7 @@
                 position.x = x;
                 position.y = y;
                 colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
-                this._drawPixel(ctx, position, colors[colorIndex]);
+                this._setPixel(ctx, position, colors[colorIndex]);
             }
         }
     };

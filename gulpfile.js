@@ -10,6 +10,8 @@ var outputFileMin = 'tile_generator.min.js';
 var jsFiles = [
     'tile_generator.js',
     'util.js',
+    'hex.js',
+    'dec.js',
     'settings.js',
     'ui.js',
     'main.js',
