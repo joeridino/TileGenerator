@@ -10,8 +10,11 @@
     };
 
     TileGenerator.Algo.prototype.setup = function (ctx) {
-        this._imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
-        this._imageDataArray = this._imageData.data;
+        this._createImageData(ctx);
+    };
+
+    TileGenerator.Algo.prototype.resized = function (ctx) {
+        this._createImageData(ctx);
     };
 
     TileGenerator.Algo.prototype.draw = function (ctx) {
@@ -37,5 +40,10 @@
 
     TileGenerator.Algo.prototype._drawPixels = function (ctx) {
         ctx.putImageData(this._imageData, 0, 0);
+    };
+
+    TileGenerator.Algo.prototype._createImageData = function (ctx) {
+        this._imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
+        this._imageDataArray = this._imageData.data;
     };
 }());

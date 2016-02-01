@@ -36,6 +36,15 @@
         }
     };
 
+    TileGenerator.Main.prototype.resized = function () {
+        var ctx,
+            i;
+        for (i = 0; i < this._algos.length; i += 1) {
+            ctx = this._ui.getCtx(this._algos[i]);
+            this._algos[i].resized(ctx);
+        }
+    };
+
     TileGenerator.Main.prototype.getSettings = function () {
         return this._settings;
     };

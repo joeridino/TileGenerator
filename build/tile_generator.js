@@ -304,9 +304,16 @@ var TileGenerator = {};
         this._colorsElement = null;
         this._newColorElement = null;
         this._colorContainerTplElement = null;
-        this._widthElement = null;
-        this._heightElement = null;
         this._redrawElement = null;
+        this._sizeElement = null;
+        this._sizes = [
+            [32, 32],
+            [64, 64],
+            [96, 96],
+            [128, 128],
+            [160, 160],
+            [192, 192]
+        ];
     };
 
     TileGenerator.Ui.prototype.onLoad = function () {
@@ -317,16 +324,11 @@ var TileGenerator = {};
         this._newColorElement = document.getElementById('new-color-btn');
         this._newColorElement.addEventListener('click', this._onAddColor.bind(this));
         this._colorContainerTplElement = document.getElementById('color-container-template');
-        this._widthElement = document.getElementById('width');
-        this._widthElement.value = this._settings.getWidth();
-        this._widthElement.addEventListener('input', this._onInputWidth.bind(this));
-        this._widthElement.addEventListener('change', this._onChangeWidth.bind(this));
-        this._heightElement = document.getElementById('height');
-        this._heightElement.value = this._settings.getHeight();
-        this._heightElement.addEventListener('input', this._onInputHeight.bind(this));
-        this._heightElement.addEventListener('change', this._onChangeHeight.bind(this));
         this._redrawElement = document.getElementById('redraw-btn');
         this._redrawElement.addEventListener('click', this._onRedraw.bind(this));
+        this._sizeElement = document.getElementById('size');
+        this._populateSizes();
+        this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
         this._addColorsFromSettings();
     };
 
@@ -428,36 +430,13 @@ var TileGenerator = {};
         this._redraw();
     };
 
-    TileGenerator.Ui.prototype._onInputWidth = function (e) {
-        var width = this._parseSize(e.target.value);
-        if (width) {
-            this._settings.setWidth(width);
-            this._resizeCanvases();
-            this._redraw();
-        }
-    };
-
-    TileGenerator.Ui.prototype._onChangeWidth = function (e) {
-        var width = this._parseSize(e.target.value);
-        if (!width) {
-            e.target.value = this._settings.getWidth();
-        }
-    };
-
-    TileGenerator.Ui.prototype._onInputHeight = function (e) {
-        var height = this._parseSize(e.target.value);
-        if (height) {
-            this._settings.setHeight(height);
-            this._resizeCanvases();
-            this._redraw();
-        }
-    };
-
-    TileGenerator.Ui.prototype._onChangeHeight = function (e) {
-        var height = this._parseSize(e.target.value);
-        if (!height) {
-            e.target.value = this._settings.getHeight();
-        }
+    TileGenerator.Ui.prototype._onChangeSize = function (e) {
+        var size = this._sizes[e.target.value];
+        this._settings.setWidth(size[0])
+            .setHeight(size[1]);
+        this._resizeCanvases();
+        TileGenerator.Main.getRef().resized();
+        this._redraw();
     };
 
     TileGenerator.Ui.prototype._onRedraw = function () {
@@ -540,6 +519,24 @@ var TileGenerator = {};
             }
         }
     };
+
+    TileGenerator.Ui.prototype._populateSizes = function () {
+        var i,
+            matchedOption,
+            option,
+            settingsHeight = this._settings.getHeight(),
+            settingsWidth = this._settings.getWidth();
+        for (i = 0; i < this._sizes.length; i += 1) {
+            option = document.createElement('option');
+            option.setAttribute('value', i);
+            option.textContent = this._sizes[i][0] + 'x' + this._sizes[i][1];
+            this._sizeElement.appendChild(option);
+            if ((i === 0) || (this._sizes[i][0] == settingsWidth && this._sizes[i][1] == settingsHeight)) {
+                matchedOption = option;
+            }
+        }
+        matchedOption.setAttribute('selected', '');
+    };
 }());
 (function () {
     'use strict';
@@ -579,6 +576,15 @@ var TileGenerator = {};
         }
     };
 
+    TileGenerator.Main.prototype.resized = function () {
+        var ctx,
+            i;
+        for (i = 0; i < this._algos.length; i += 1) {
+            ctx = this._ui.getCtx(this._algos[i]);
+            this._algos[i].resized(ctx);
+        }
+    };
+
     TileGenerator.Main.prototype.getSettings = function () {
         return this._settings;
     };
@@ -601,8 +607,11 @@ var TileGenerator = {};
     };
 
     TileGenerator.Algo.prototype.setup = function (ctx) {
-        this._imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
-        this._imageDataArray = this._imageData.data;
+        this._createImageData(ctx);
+    };
+
+    TileGenerator.Algo.prototype.resized = function (ctx) {
+        this._createImageData(ctx);
     };
 
     TileGenerator.Algo.prototype.draw = function (ctx) {
@@ -628,6 +637,11 @@ var TileGenerator = {};
 
     TileGenerator.Algo.prototype._drawPixels = function (ctx) {
         ctx.putImageData(this._imageData, 0, 0);
+    };
+
+    TileGenerator.Algo.prototype._createImageData = function (ctx) {
+        this._imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
+        this._imageDataArray = this._imageData.data;
     };
 }());
 (function () {
