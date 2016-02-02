@@ -7,6 +7,7 @@
         this._title = null;
         this._imageData = null;
         this._imageDataArray = null;
+        this._imageDataModified = false;
     };
 
     TileGenerator.Algo.prototype.setup = function (ctx) {
@@ -31,11 +32,16 @@
     };
 
     TileGenerator.Algo.prototype._setPixel = function (ctx, position, color) {
-        var index = (position.y * ctx.canvas.width + position.x) * 4;
+        var index = this._getPixelIndex(ctx, position.x, position.y);
         this._imageDataArray[index++] = color[0];
         this._imageDataArray[index++] = color[1];
         this._imageDataArray[index++] = color[2];
         this._imageDataArray[index++] = 255;
+        this._imageDataModified = true;
+    };
+
+    TileGenerator.Algo.prototype._getPixelIndex = function (ctx, x, y) {
+        return (y * ctx.canvas.width + x) * 4;
     };
 
     TileGenerator.Algo.prototype._drawPixels = function (ctx) {
@@ -45,5 +51,6 @@
     TileGenerator.Algo.prototype._createImageData = function (ctx) {
         this._imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
         this._imageDataArray = this._imageData.data;
+        this._imageDataModified = false;
     };
 }());

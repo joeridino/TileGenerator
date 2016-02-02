@@ -10,12 +10,4 @@
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor8);
-
-    TileGenerator.AlgoNeighbor8.prototype.draw = function (ctx) {
-        parent.prototype.draw.call(this, ctx);
-    };
-
-    TileGenerator.AlgoNeighbor8.prototype.getRandomNeighborColorIndex = function (options) {
-        return parent.getRandomNeighborColorIndex.call(this, options);
-    };
 }());

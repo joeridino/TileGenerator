@@ -10,12 +10,12 @@
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor);
 
     TileGenerator.AlgoNeighbor.prototype._setPixels = function (ctx) {
-        var colorIndex,
+        var color,
+            colorIndex,
             colors = this._settings.getColors(),
             colorWeights = this._settings.getColorWeights(),
-            indexOptions,
-            lastColorIndex,
-            pixelColorIndices = [],
+            lastColor,
+            maxSameColorCount,
             position = {},
             rows = [],
             sameColorCount = 0,
@@ -23,66 +23,61 @@
             y;
         for (y = 0; y < this._settings.getHeight(); y += 1) {
             rows.push(y);
-            pixelColorIndices[y] = [];
         }
+        maxSameColorCount = Math.floor(this._settings.getWidth() / 10);
         TileGenerator.Util.randomizeArray(rows);
-        indexOptions = {
-            pixelColorIndices: pixelColorIndices,
-            x: 0,
-            y: 0,
-            numNeighbors: 4
-        };
+        if (this._imageDataModified) {
+            this._createImageData(ctx);
+        }
         for (y = 0; y < rows.length; y += 1) {
             for (x = 0; x < this._settings.getWidth(); x += 1) {
-                indexOptions.x = x;
-                indexOptions.y = y;
-                colorIndex = this._getRandomNeighborColorIndex(indexOptions);
-                if (colorIndex === null) {
+                color = this._getRandomNeighborColor(ctx, x, y);
+                if (color === null) {
                     colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    color = colors[colorIndex];
                 }
-                if (lastColorIndex === colorIndex) {
+                if (this._colorMatch(color, lastColor)) {
                     ++sameColorCount;
                 }
-                if (sameColorCount > 10) {
+                if (sameColorCount > maxSameColorCount) {
                     sameColorCount = 0;
                     colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    color = colors[colorIndex];
                 }
-                lastColorIndex = colorIndex;
-                pixelColorIndices[y][x] = colorIndex;
+                lastColor = color;
                 position.x = x;
                 position.y = y;
-                this._setPixel(ctx, position, colors[colorIndex]);
+                this._setPixel(ctx, position, color);
             }
         }
     };
 
-    TileGenerator.AlgoNeighbor.prototype._getRandomNeighborColorIndex = function (options) {
+    TileGenerator.AlgoNeighbor.prototype._getRandomNeighborColor = function (ctx, x, y) {
         var i,
             neighbors = [],
-            y,
-            x;
-        if (options.y > 0) {
+            pixelIndex;
+        if (y > 0) {
             neighbors.push({
-                x: options.x,
-                y: options.y - 1
+                x: x,
+                y: y - 1
             });
         }
-        if (options.y < this._settings.getHeight() - 1) {
+        if (y < this._settings.getHeight() - 1) {
             neighbors.push({
-                x: options.x,
-                y: options.y + 1
+                x: x,
+                y: y + 1
             });
         }
-        if (options.x > 0) {
+        if (x > 0) {
             neighbors.push({
-                x: options.x - 1,
-                y: options.y
+                x: x - 1,
+                y: y
             });
         }
-        if (options.x < this._settings.getWidth() - 1) {
+        if (x < this._settings.getWidth() - 1) {
             neighbors.push({
-                x: options.x + 1,
-                y: options.y
+                x: x + 1,
+                y: y
             });
         }
         if (neighbors.length === 0) {
@@ -90,12 +85,26 @@
         }
         TileGenerator.Util.randomizeArray(neighbors);
         for (i = 0; i < neighbors.length; i += 1) {
-            y = neighbors[i].y;
-            x = neighbors[i].x;
-            if (options.pixelColorIndices[y][x] !== undefined) {
-                return options.pixelColorIndices[y][x];
+            pixelIndex = this._getPixelIndex(ctx, neighbors[i].x, neighbors[i].y);
+            if (this._imageDataArray[pixelIndex + 3] !== 0) {
+                return [
+                    this._imageDataArray[pixelIndex++],
+                    this._imageDataArray[pixelIndex++],
+                    this._imageDataArray[pixelIndex++]
+                ];
             }
         }
         return null;
+    };
+
+    TileGenerator.AlgoNeighbor.prototype._colorMatch = function (color1, color2) {
+        if (color1
+                && color2
+                && color1[0] === color2[0]
+                && color1[1] === color2[1]
+                && color1[2] === color2[2]) {
+            return true;
+        }
+        return false;
     };
 }());
