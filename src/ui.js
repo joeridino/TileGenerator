@@ -35,6 +35,7 @@
         this._sizeElement = document.getElementById('size');
         this._populateSizes();
         this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
+        this._sizeElement.addEventListener('keyup', this._onKeySize.bind(this));
         this._addColorsFromSettings();
     };
 
@@ -130,19 +131,39 @@
 
     TileGenerator.Ui.prototype._onChangeColorWeight = function (e) {
         var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container'),
+            colorWeight = parseInt(e.target.value, 10),
             index;
         index = this._getSiblingIndex(colorContainerElement);
-        this._settings.updateColorWeight(index, parseInt(e.target.value, 10));
-        this._redraw();
+        if (this._settings.getColorWeight(index) !== colorWeight) {
+            this._settings.updateColorWeight(index, colorWeight);
+            this._redraw();
+        }
+    };
+
+    TileGenerator.Ui.prototype._onKeyColorWeight = function (e) {
+        this._onChangeColorWeight(e);
+    };
+
+    TileGenerator.Ui.prototype._onMouseColorWeight = function (e) {
+        this._onChangeColorWeight(e);
     };
 
     TileGenerator.Ui.prototype._onChangeSize = function (e) {
-        var size = this._sizes[e.target.value];
-        this._settings.setWidth(size[0])
-            .setHeight(size[1]);
-        this._resizeCanvases();
-        TileGenerator.Main.getRef().resized();
-        this._redraw();
+        var size,
+            sizeIndex = parseInt(e.target.value, 10);
+        size = this._sizes[sizeIndex];
+        if (this._settings.getWidth() !== size[0]
+                && this._settings.getHeight() !== size[1]) {
+            this._settings.setWidth(size[0])
+                .setHeight(size[1]);
+            this._resizeCanvases();
+            TileGenerator.Main.getRef().resized();
+            this._redraw();
+        }
+    };
+
+    TileGenerator.Ui.prototype._onKeySize = function (e) {
+        this._onChangeSize(e);
     };
 
     TileGenerator.Ui.prototype._onRedraw = function () {
@@ -176,7 +197,8 @@
         colorValueElement.addEventListener('input', this._onInputColorValue.bind(this));
         colorValueElement.addEventListener('change', this._onChangeColorValue.bind(this));
         colorWeightElement.addEventListener('input', this._onInputColorWeight.bind(this));
-        colorWeightElement.addEventListener('change', this._onChangeColorWeight.bind(this));
+        colorWeightElement.addEventListener('keyup', this._onKeyColorWeight.bind(this));
+        colorWeightElement.addEventListener('mouseup', this._onMouseColorWeight.bind(this));
         this._colorsElement.appendChild(tpl);
     };
 
