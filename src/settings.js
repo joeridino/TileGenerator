@@ -2,15 +2,13 @@
     'use strict';
 
     TileGenerator.Settings = function () {
-        this._width = 96;
-        this._height = 96;
+        this._width = 128;
+        this._height = 128;
         this._colors = [
             [255, 0, 0],
-            [0, 255, 0],
-            [0, 0, 255]
+            [0, 255, 0]
         ];
         this._colorWeights = [
-            100,
             100,
             100
         ];
