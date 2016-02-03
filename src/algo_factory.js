@@ -8,6 +8,7 @@
         return [
             new TileGenerator.AlgoRandom(settings),
             new TileGenerator.AlgoSmearing(settings),
+            new TileGenerator.AlgoBrick(settings),
             new TileGenerator.AlgoNeighbor4(settings),
             new TileGenerator.AlgoNeighbor8(settings)
         ];
