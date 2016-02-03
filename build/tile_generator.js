@@ -781,7 +781,8 @@ var TileGenerator = {};
         for (i = 0; i < colors.length; i += 1) {
             hexColors.push(TileGenerator.Dec.decArrayToSimpleHex(colors[i]));
         }
-        numRects = width * height;
+        // numRects = width * height;
+        numRects = width;
         rectRandWidth = Math.floor(width / 100);
         rectRandHeight = Math.floor(height / 100);
         rectMinWidth = Math.floor(width / 10);
@@ -863,30 +864,7 @@ var TileGenerator = {};
         var i,
             neighbors = [],
             pixelIndex;
-        if (y > 0) {
-            neighbors.push({
-                x: x,
-                y: y - 1
-            });
-        }
-        if (y < this._settings.getHeight() - 1) {
-            neighbors.push({
-                x: x,
-                y: y + 1
-            });
-        }
-        if (x > 0) {
-            neighbors.push({
-                x: x - 1,
-                y: y
-            });
-        }
-        if (x < this._settings.getWidth() - 1) {
-            neighbors.push({
-                x: x + 1,
-                y: y
-            });
-        }
+        neighbors = this._getNeighbors(x, y);
         if (neighbors.length === 0) {
             return null;
         }
@@ -927,11 +905,40 @@ var TileGenerator = {};
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor4);
+
+    TileGenerator.AlgoNeighbor4.prototype._getNeighbors = function (x, y) {
+        var neighbors = [];
+        if (y > 0) {
+            neighbors.push({
+                x: x,
+                y: y - 1
+            });
+        }
+        if (y < this._settings.getHeight() - 1) {
+            neighbors.push({
+                x: x,
+                y: y + 1
+            });
+        }
+        if (x > 0) {
+            neighbors.push({
+                x: x - 1,
+                y: y
+            });
+        }
+        if (x < this._settings.getWidth() - 1) {
+            neighbors.push({
+                x: x + 1,
+                y: y
+            });
+        }
+        return neighbors;
+    };
 }());
 (function () {
     'use strict';
 
-    var parent = TileGenerator.AlgoNeighbor;
+    var parent = TileGenerator.AlgoNeighbor4;
 
     TileGenerator.AlgoNeighbor8 = function (settings) {
         parent.call(this, settings);
@@ -940,6 +947,35 @@ var TileGenerator = {};
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor8);
+
+    TileGenerator.AlgoNeighbor8.prototype._getNeighbors = function (x, y) {
+        var neighbors = parent.prototype._getNeighbors.call(this, x, y);
+        if (x > 0 && y > 0) {
+            neighbors.push({
+                x: x - 1,
+                y: y - 1
+            });
+        }
+        if ((x < this._settings.getWidth() - 1) && y > 0) {
+            neighbors.push({
+                x: x + 1,
+                y: y - 1
+            });
+        }
+        if (x > 0 && (y < this._settings.getHeight() - 1)) {
+            neighbors.push({
+                x: x - 1,
+                y: y + 1
+            });
+        }
+        if ((x < this._settings.getWidth() - 1) && (y < this._settings.getHeight() - 1)) {
+            neighbors.push({
+                x: x + 1,
+                y: y + 1
+            });
+        }
+        return neighbors;
+    };
 }());
 (function () {
     'use strict';

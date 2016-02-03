@@ -56,30 +56,7 @@
         var i,
             neighbors = [],
             pixelIndex;
-        if (y > 0) {
-            neighbors.push({
-                x: x,
-                y: y - 1
-            });
-        }
-        if (y < this._settings.getHeight() - 1) {
-            neighbors.push({
-                x: x,
-                y: y + 1
-            });
-        }
-        if (x > 0) {
-            neighbors.push({
-                x: x - 1,
-                y: y
-            });
-        }
-        if (x < this._settings.getWidth() - 1) {
-            neighbors.push({
-                x: x + 1,
-                y: y
-            });
-        }
+        neighbors = this._getNeighbors(x, y);
         if (neighbors.length === 0) {
             return null;
         }

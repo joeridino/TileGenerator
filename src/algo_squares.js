@@ -34,7 +34,8 @@
         for (i = 0; i < colors.length; i += 1) {
             hexColors.push(TileGenerator.Dec.decArrayToSimpleHex(colors[i]));
         }
-        numRects = width * height;
+        // numRects = width * height;
+        numRects = width;
         rectRandWidth = Math.floor(width / 100);
         rectRandHeight = Math.floor(height / 100);
         rectMinWidth = Math.floor(width / 10);
