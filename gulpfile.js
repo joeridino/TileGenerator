@@ -18,7 +18,6 @@ var jsFiles = [
     'algo.js',
     'algo_random.js',
     'algo_smearing.js',
-    'algo_squares.js',
     'algo_neighbor.js',
     'algo_neighbor4.js',
     'algo_neighbor8.js',
