@@ -7,51 +7,51 @@
     </head>
     <body>
       <h1>Tile Generator</h1>
-      <div id="canvases" class="canvases">
-          <div id="canvases-dynamic" class="canvases-dynamic"></div>
-          <div id="canvas-container-template" class="canvas-container-template">
-              <h2 class="canvas-title"></h2>
-              <p class="canvas-description"></p>
+      <div id="tg-canvases" class="tg-canvases">
+          <div id="tg-canvases-dynamic" class="tg-canvases-dynamic"></div>
+          <div id="tg-canvas-container-template" class="tg-canvas-container-template">
+              <h2 class="tg-canvas-title"></h2>
+              <p class="tg-canvas-description"></p>
               <canvas tabindex="0"></canvas>
           </div>
-          <div class="clearfix"></div>
+          <div class="tg-clearfix"></div>
       </div>
-      <div id="controls" class="controls">
-        <h2 class="title">Options</h2>
-          <div class="new-color">
-              <button id="new-color-btn" type="button">Add Color</button>
-              <button id="redraw-btn" type="button">Redraw</button>
+      <div id="tg-controls" class="tg-controls">
+        <h2 class="tg-title">Options</h2>
+          <div class="tg-new-color">
+              <button id="tg-new-color-btn" type="button">Add Color</button>
+              <button id="tg-redraw-btn" type="button">Redraw</button>
           </div>
-          <div class="size">
+          <div class="tg-size">
               <label for="size">Size:</label>
-              <select id="size" name="size"></select>
+              <select id="tg-size" name="size"></select>
           </div>
-          <div id="colors-dynamic" class="colors"></div>
-          <div id="color-container-template" class="color-container-template">
-              <div class="color-combo">
-                <input type="color" value="#000000" class="color">
-                <input type="text" value="#000000" size="7" maxlength="7" class="color-value">
+          <div id="tg-colors-dynamic" class="tg-colors"></div>
+          <div id="tg-color-container-template" class="tg-color-container-template">
+              <div class="tg-color-combo">
+                <input type="color" value="#000000" class="tg-color">
+                <input type="text" value="#000000" size="7" maxlength="7" class="tg-color-value">
               </div>
-              <div class="color-weight-combo">
-                <label for="color-weight-range" class="color-weight-label">Weight:</label>
-                <input type="range" min="0" max="100" step="1" value="100" class="color-weight-range">
-                <div class="color-weight-value">100</div>
+              <div class="tg-color-weight-combo">
+                <label for="color-weight-range" class="tg-color-weight-label">Weight:</label>
+                <input type="range" min="0" max="100" step="1" value="100" class="tg-color-weight-range">
+                <div class="tg-color-weight-value">100</div>
               </div>
-              <button type="button" class="remove-color-btn">Remove</button>
+              <button type="button" class="tg-remove-color-btn">Remove</button>
           </div>
-          <div class="clearfix"></div>
+          <div class="tg-clearfix"></div>
       </div>
-      <div id="map" class="map">
-          <h2 class="map-title"></h2>
-          <p class="map-description"></p>
-          <canvas id="map-canvas"></canvas>
-          <div class="map-links">
-              <a href="" class="map-link map-link-previous">previous</a>
-              <a href="" class="map-link map-link-next">next</a>
-              <a href="" class="map-link map-link-close">close</a>
-              <div class="clearfix"></div>
+      <div id="tg-map" class="tg-map">
+          <h2 class="tg-map-title"></h2>
+          <p class="tg-map-description"></p>
+          <canvas id="tg-map-canvas"></canvas>
+          <div class="tg-map-links">
+              <a href="" class="tg-map-link tg-map-link-previous">previous</a>
+              <a href="" class="tg-map-link tg-map-link-next">next</a>
+              <a href="" class="tg-map-link tg-map-link-close">close</a>
+              <div class="tg-clearfix"></div>
           </div>
       </div>
-      <div id="dim" class="dim"></div>
+      <div id="tg-dim" class="tg-dim"></div>
     </body>
 </html>

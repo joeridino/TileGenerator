@@ -22,11 +22,11 @@
 
     TileGenerator.Map.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
-        this._dimElement = document.getElementById('dim');
-        this._mapElement = document.getElementById('map');
-        this._previousElement = this._mapElement.querySelector('.map-link-previous');
-        this._nextElement = this._mapElement.querySelector('.map-link-next');
-        this._closeElement = this._mapElement.querySelector('.map-link-close');
+        this._dimElement = document.getElementById('tg-dim');
+        this._mapElement = document.getElementById('tg-map');
+        this._previousElement = this._mapElement.querySelector('.tg-map-link-previous');
+        this._nextElement = this._mapElement.querySelector('.tg-map-link-next');
+        this._closeElement = this._mapElement.querySelector('.tg-map-link-close');
         this._createCanvas();
     };
 
@@ -36,10 +36,9 @@
     };
 
     TileGenerator.Map.prototype.show = function (canvas) {
-        var dimElement = document.getElementById('dim'),
-            mapRect;
+        var mapRect;
         this._sourceCanvas = canvas;
-        dimElement.style.display = 'block';
+        this._dimElement.style.display = 'block';
         this._mapElement.style.display = 'block';
         this._nextElement.focus();
         this._populate();
@@ -53,7 +52,7 @@
     };
 
     TileGenerator.Map.prototype._hide = function () {
-        var dimElement = document.getElementById('dim');
+        var dimElement = document.getElementById('tg-dim');
         dimElement.style.display = 'none';
         this._mapElement.style.display = 'none';
         document.removeEventListener('keyup', this._keyHandler);
@@ -64,9 +63,9 @@
     };
 
     TileGenerator.Map.prototype._populate = function () {
-        var canvasContainerElement = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
-        this._mapElement.querySelector('.map-title').textContent = canvasContainerElement.querySelector('.canvas-title').textContent;
-        this._mapElement.querySelector('.map-description').textContent = canvasContainerElement.querySelector('.canvas-description').textContent;
+        var canvasContainerElement = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'tg-canvas-container');
+        this._mapElement.querySelector('.tg-map-title').textContent = canvasContainerElement.querySelector('.tg-canvas-title').textContent;
+        this._mapElement.querySelector('.tg-map-description').textContent = canvasContainerElement.querySelector('.tg-canvas-description').textContent;
     };
 
     TileGenerator.Map.prototype._draw = function () {
@@ -121,10 +120,10 @@
     TileGenerator.Map.prototype._previous = function () {
         var canvasesParent,
             prevContainer,
-            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'tg-canvas-container');
         prevContainer = sourceContainer.previousSibling;
         if (!prevContainer) {
-            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'canvases-dynamic');
+            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'tg-canvases-dynamic');
             prevContainer = canvasesParent.lastChild;
         }
         this._changeCanvas(prevContainer.querySelector('canvas'));
@@ -133,17 +132,17 @@
     TileGenerator.Map.prototype._next = function () {
         var canvasesParent,
             nextContainer,
-            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'tg-canvas-container');
         nextContainer = sourceContainer.nextSibling;
         if (!nextContainer) {
-            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'canvases-dynamic');
+            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'tg-canvases-dynamic');
             nextContainer = canvasesParent.firstChild;
         }
         this._changeCanvas(nextContainer.querySelector('canvas'));
     };
 
     TileGenerator.Map.prototype._createCanvas = function () {
-        this._mapCanvas = document.getElementById('map-canvas');
+        this._mapCanvas = document.getElementById('tg-map-canvas');
         this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
         this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
         this._mapCtx = this._mapCanvas.getContext('2d');

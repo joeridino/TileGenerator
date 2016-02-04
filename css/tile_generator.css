@@ -1,8 +1,8 @@
-.clearfix {
+.tg-clearfix {
     clear: both;
 }
 
-.dim {
+.tg-dim {
     background-color: #fff;
     display: none;
     height: 100%;
@@ -14,87 +14,87 @@
     z-index: 1000;
 }
 
-.canvases canvas {
+.tg-canvases canvas {
     cursor: pointer;
 }
 
-.canvases .canvas-container-template {
+.tg-canvases .tg-canvas-container-template {
     display: none;
 }
 
-.canvases .canvas-container {
+.tg-canvases .tg-canvas-container {
     float: left;
 }
 
-.canvases .canvas-container:not(:last-of-type) {
+.tg-canvases .tg-canvas-container:not(:last-of-type) {
     margin-right: 10px;
 }
 
-.canvases .canvas-container .canvas-title,
-.canvases .canvas-container .canvas-description {
+.tg-canvases .tg-canvas-container .tg-canvas-title,
+.tg-canvases .tg-canvas-container .tg-canvas-description {
     display: none;
 }
 
-.controls {
+.tg-controls {
     clear: both;
     margin-top: 20px;
 }
 
-.controls .color-container-template {
+.tg-controls .tg-color-container-template {
     display: none;
 }
 
-.controls .new-color {
+.tg-controls .tg-new-color {
     margin-top: 20px;
 }
 
-.controls .new-color button:not(:first-of-type) {
+.tg-controls .tg-new-color button:not(:first-of-type) {
     margin-left: 10px;
 }
 
-.controls .size,
-.controls .colors {
+.tg-controls .tg-size,
+.tg-controls .tg-colors {
     margin-top: 20px;
 }
 
-.controls .size label:not(:first-of-type) {
+.tg-controls .tg-size label:not(:first-of-type) {
     margin-left: 10px;
 }
 
-.controls .colors .color-container:not(:first-child) {
+.tg-controls .tg-colors .tg-color-container:not(:first-child) {
     margin-top: 20px;
 }
 
-.controls .colors .color-container .color-combo {
+.tg-controls .tg-colors .tg-color-container .tg-color-combo {
     display: inline-block;
 }
 
-.controls .colors .color-container .color-weight-combo {
+.tg-controls .tg-colors .tg-color-container .tg-color-weight-combo {
     display: inline-block;
 }
 
-.controls .colors .color-container .color-weight-label {
+.tg-controls .tg-colors .tg-color-container .tg-color-weight-label {
     margin-left: 5px;
 }
 
-.controls .colors .color-container .color-weight-range {
+.tg-controls .tg-colors .tg-color-container .tg-color-weight-range {
     margin: 0;
     padding: 0;
     width: 75px;
     vertical-align: middle;
 }
 
-.controls .colors .color-container .color-weight-value {
+.tg-controls .tg-colors .tg-color-container .tg-color-weight-value {
     display: inline-block;
     margin-left: 5px;
     min-width: 30px;
 }
 
-.controls .colors .color-container .remove-color-btn {
+.tg-controls .tg-colors .tg-color-container .tg-remove-color-btn {
     margin-left: 10px;
 }
 
-.map {
+.tg-map {
     background-color: #333;
     color: #fff;
     display: none;
@@ -103,34 +103,34 @@
     z-index: 2000;
 }
 
-.map h2 {
+.tg-map h2 {
     margin: 0 0 10px;
 }
 
-.map .map-links {
+.tg-map .tg-map-links {
     margin-top: 10px;
     text-transform: uppercase;
 }
 
-.map .map-links .map-link {
+.tg-map .tg-map-links .tg-map-link {
     color: #fff;
 }
 
-.map .map-links .map-link:not(:last-of-type) {
+.tg-map .tg-map-links .tg-map-link:not(:last-of-type) {
     margin-right: 10px;
 }
 
 @media (max-width: 440px) {
-    .controls .colors .color-container .color-weight-combo {
+    .tg-controls .tg-colors .tg-color-container .tg-color-weight-combo {
         clear: both;
         display: block;
     }
 
-    .controls .colors .color-container .color-weight-label {
+    .tg-controls .tg-colors .tg-color-container .tg-color-weight-label {
         margin-left: 0px;
     }
 
-    .controls .colors .color-container .remove-color-btn {
+    .tg-controls .tg-colors .tg-color-container .tg-remove-color-btn {
         margin-left: 0px;
     }
 }

@@ -339,15 +339,15 @@ var TileGenerator = {};
 
     TileGenerator.Ui.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
-        this._canvasesElement = document.getElementById('canvases-dynamic');
-        this._canvasContainerTplElement = document.getElementById('canvas-container-template');
-        this._colorsElement = document.getElementById('colors-dynamic');
-        this._newColorElement = document.getElementById('new-color-btn');
+        this._canvasesElement = document.getElementById('tg-canvases-dynamic');
+        this._canvasContainerTplElement = document.getElementById('tg-canvas-container-template');
+        this._colorsElement = document.getElementById('tg-colors-dynamic');
+        this._newColorElement = document.getElementById('tg-new-color-btn');
         this._newColorElement.addEventListener('click', this._onAddColor.bind(this));
-        this._colorContainerTplElement = document.getElementById('color-container-template');
-        this._redrawElement = document.getElementById('redraw-btn');
+        this._colorContainerTplElement = document.getElementById('tg-color-container-template');
+        this._redrawElement = document.getElementById('tg-redraw-btn');
         this._redrawElement.addEventListener('click', this._onRedraw.bind(this));
-        this._sizeElement = document.getElementById('size');
+        this._sizeElement = document.getElementById('tg-size');
         this._populateSizes();
         this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
         this._sizeElement.addEventListener('keyup', this._onKeySize.bind(this));
@@ -370,9 +370,9 @@ var TileGenerator = {};
             tpl;
         tpl = this._canvasContainerTplElement.cloneNode(deep);
         tpl.removeAttribute('id');
-        tpl.setAttribute('class', 'canvas-container');
-        tpl.querySelector('.canvas-title').textContent = title;
-        tpl.querySelector('.canvas-description').textContent = description;
+        tpl.setAttribute('class', 'tg-canvas-container');
+        tpl.querySelector('.tg-canvas-title').textContent = title;
+        tpl.querySelector('.tg-canvas-description').textContent = description;
         canvas = tpl.querySelector('canvas');
         canvas.dataset.algoId = algoId;
         canvas.width = this._settings.getWidth();
@@ -409,8 +409,8 @@ var TileGenerator = {};
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
-        var simpleColor = this._colorContainerTplElement.querySelector('.color').value,
-            colorWeight = parseInt(this._colorContainerTplElement.querySelector('.color-weight-range').value, 10);
+        var simpleColor = this._colorContainerTplElement.querySelector('.tg-color').value,
+            colorWeight = parseInt(this._colorContainerTplElement.querySelector('.tg-color-weight-range').value, 10);
         this._addColorToDom(simpleColor, colorWeight);
         this._settings.addColor(TileGenerator.Hex.simpleToDecArray(simpleColor))
             .addColorWeight(colorWeight);
@@ -421,7 +421,7 @@ var TileGenerator = {};
         var colorContainerElement,
             index;
         if (this._settings.getNumColors() > 1) {
-            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container');
             index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
             this._settings.removeColor(index)
                 .removeColorWeight(index);
@@ -433,11 +433,11 @@ var TileGenerator = {};
     };
 
     TileGenerator.Ui.prototype._onChangeColor = function (e) {
-        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container'),
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container'),
             index;
         index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
         this._settings.updateColor(index, TileGenerator.Hex.simpleToDecArray(e.target.value));
-        colorContainerElement.querySelector('.color-value').value = e.target.value;
+        colorContainerElement.querySelector('.tg-color-value').value = e.target.value;
         this._redraw();
     };
 
@@ -446,8 +446,8 @@ var TileGenerator = {};
             colorElement,
             eventObj;
         if (TileGenerator.Hex.isSimpleHex(e.target.value)) {
-            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
-            colorElement = colorContainerElement.querySelector('.color');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container');
+            colorElement = colorContainerElement.querySelector('.tg-color');
             colorElement.value = e.target.value;
             eventObj = new Event('change');
             colorElement.dispatchEvent(eventObj);
@@ -458,19 +458,19 @@ var TileGenerator = {};
         var colorContainerElement,
             colorElement;
         if (!TileGenerator.Hex.isSimpleHex(e.target.value)) {
-            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
-            colorElement = colorContainerElement.querySelector('.color');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container');
+            colorElement = colorContainerElement.querySelector('.tg-color');
             e.target.value = colorElement.value;
         }
     };
 
     TileGenerator.Ui.prototype._onInputColorWeight = function (e) {
-        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
-        colorContainerElement.querySelector('.color-weight-value').textContent = e.target.value;
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container');
+        colorContainerElement.querySelector('.tg-color-weight-value').textContent = e.target.value;
     };
 
     TileGenerator.Ui.prototype._onChangeColorWeight = function (e) {
-        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container'),
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container'),
             colorWeight = parseInt(e.target.value, 10),
             index;
         index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
@@ -523,16 +523,16 @@ var TileGenerator = {};
             tpl;
         tpl = this._colorContainerTplElement.cloneNode(deep);
         tpl.removeAttribute('id');
-        tpl.setAttribute('class', 'color-container');
-        colorElement = tpl.querySelector('.color');
-        colorValueElement = tpl.querySelector('.color-value');
-        colorWeightElement = tpl.querySelector('.color-weight-range');
-        colorWeightValueElement = tpl.querySelector('.color-weight-value');
+        tpl.setAttribute('class', 'tg-color-container');
+        colorElement = tpl.querySelector('.tg-color');
+        colorValueElement = tpl.querySelector('.tg-color-value');
+        colorWeightElement = tpl.querySelector('.tg-color-weight-range');
+        colorWeightValueElement = tpl.querySelector('.tg-color-weight-value');
         colorElement.value = simpleColor;
         colorValueElement.value = simpleColor;
         colorWeightElement.value = colorWeight;
         colorWeightValueElement.textContent = colorWeight;
-        tpl.querySelector('.remove-color-btn').addEventListener('click', this._onRemoveColor.bind(this));
+        tpl.querySelector('.tg-remove-color-btn').addEventListener('click', this._onRemoveColor.bind(this));
         colorElement.addEventListener('change', this._onChangeColor.bind(this));
         colorValueElement.addEventListener('input', this._onInputColorValue.bind(this));
         colorValueElement.addEventListener('change', this._onChangeColorValue.bind(this));
@@ -614,11 +614,11 @@ var TileGenerator = {};
 
     TileGenerator.Map.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
-        this._dimElement = document.getElementById('dim');
-        this._mapElement = document.getElementById('map');
-        this._previousElement = this._mapElement.querySelector('.map-link-previous');
-        this._nextElement = this._mapElement.querySelector('.map-link-next');
-        this._closeElement = this._mapElement.querySelector('.map-link-close');
+        this._dimElement = document.getElementById('tg-dim');
+        this._mapElement = document.getElementById('tg-map');
+        this._previousElement = this._mapElement.querySelector('.tg-map-link-previous');
+        this._nextElement = this._mapElement.querySelector('.tg-map-link-next');
+        this._closeElement = this._mapElement.querySelector('.tg-map-link-close');
         this._createCanvas();
     };
 
@@ -628,10 +628,9 @@ var TileGenerator = {};
     };
 
     TileGenerator.Map.prototype.show = function (canvas) {
-        var dimElement = document.getElementById('dim'),
-            mapRect;
+        var mapRect;
         this._sourceCanvas = canvas;
-        dimElement.style.display = 'block';
+        this._dimElement.style.display = 'block';
         this._mapElement.style.display = 'block';
         this._nextElement.focus();
         this._populate();
@@ -645,7 +644,7 @@ var TileGenerator = {};
     };
 
     TileGenerator.Map.prototype._hide = function () {
-        var dimElement = document.getElementById('dim');
+        var dimElement = document.getElementById('tg-dim');
         dimElement.style.display = 'none';
         this._mapElement.style.display = 'none';
         document.removeEventListener('keyup', this._keyHandler);
@@ -656,9 +655,9 @@ var TileGenerator = {};
     };
 
     TileGenerator.Map.prototype._populate = function () {
-        var canvasContainerElement = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
-        this._mapElement.querySelector('.map-title').textContent = canvasContainerElement.querySelector('.canvas-title').textContent;
-        this._mapElement.querySelector('.map-description').textContent = canvasContainerElement.querySelector('.canvas-description').textContent;
+        var canvasContainerElement = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'tg-canvas-container');
+        this._mapElement.querySelector('.tg-map-title').textContent = canvasContainerElement.querySelector('.tg-canvas-title').textContent;
+        this._mapElement.querySelector('.tg-map-description').textContent = canvasContainerElement.querySelector('.tg-canvas-description').textContent;
     };
 
     TileGenerator.Map.prototype._draw = function () {
@@ -713,10 +712,10 @@ var TileGenerator = {};
     TileGenerator.Map.prototype._previous = function () {
         var canvasesParent,
             prevContainer,
-            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'tg-canvas-container');
         prevContainer = sourceContainer.previousSibling;
         if (!prevContainer) {
-            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'canvases-dynamic');
+            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'tg-canvases-dynamic');
             prevContainer = canvasesParent.lastChild;
         }
         this._changeCanvas(prevContainer.querySelector('canvas'));
@@ -725,17 +724,17 @@ var TileGenerator = {};
     TileGenerator.Map.prototype._next = function () {
         var canvasesParent,
             nextContainer,
-            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'tg-canvas-container');
         nextContainer = sourceContainer.nextSibling;
         if (!nextContainer) {
-            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'canvases-dynamic');
+            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'tg-canvases-dynamic');
             nextContainer = canvasesParent.firstChild;
         }
         this._changeCanvas(nextContainer.querySelector('canvas'));
     };
 
     TileGenerator.Map.prototype._createCanvas = function () {
-        this._mapCanvas = document.getElementById('map-canvas');
+        this._mapCanvas = document.getElementById('tg-map-canvas');
         this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
         this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
         this._mapCtx = this._mapCanvas.getContext('2d');
