@@ -7,6 +7,7 @@
         parent.call(this, settings);
         this._id = 'neighbor8';
         this._title = 'Neighbor 8';
+        this._description = 'Pixel colors are based off 8 neighboring pixels.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor8);

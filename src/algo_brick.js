@@ -7,6 +7,7 @@
         parent.call(this, settings);
         this._id = 'brick';
         this._title = 'Brick';
+        this._description = 'Rectangles and lines create bricks.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoBrick);
@@ -39,9 +40,9 @@
         if (brickHexColors.length === 0) {
             brickHexColors.push(outlineHexColor);
         }
-        brickWidth = Math.floor(this._settings.getWidth() / 8);
+        brickWidth = Math.floor(this._settings.getWidth() / 4);
         halfBrickWidth = Math.floor(brickWidth / 2);
-        brickHeight = Math.floor(this._settings.getHeight() / 16);
+        brickHeight = Math.floor(this._settings.getHeight() / 8);
         numBricksX = Math.floor(this._settings.getWidth() / brickWidth);
         numBricksY = Math.floor(this._settings.getHeight() / brickHeight);
         ctx.strokeStyle = outlineHexColor;

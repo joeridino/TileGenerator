@@ -7,6 +7,7 @@
         parent.call(this, settings);
         this._id = 'neighbor4';
         this._title = 'Neighbor 4';
+        this._description = 'Pixel colors are based off 4 neighboring pixels (north, south, east, and west).';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor4);

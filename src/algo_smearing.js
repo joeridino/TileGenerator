@@ -7,6 +7,7 @@
         parent.call(this, settings);
         this._id = 'smearing';
         this._title = 'Smearing';
+        this._description = 'Pixels are assigned a continuous set of colors in random amounts.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoSmearing);

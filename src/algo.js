@@ -5,6 +5,7 @@
         this._settings = settings;
         this._id = null;
         this._title = null;
+        this._description = null;
         this._imageData = null;
         this._imageDataArray = null;
         this._imageDataModified = false;
@@ -29,6 +30,10 @@
 
     TileGenerator.Algo.prototype.getTitle = function () {
         return this._title;
+    };
+
+    TileGenerator.Algo.prototype.getDescription = function () {
+        return this._description;
     };
 
     TileGenerator.Algo.prototype._setPixel = function (ctx, position, color) {

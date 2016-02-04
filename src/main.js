@@ -24,6 +24,7 @@
             ctx = this._ui.getCtx(this._algos[i]);
             this._algos[i].setup(ctx);
         }
+        this._ui.onLoadEnd();
     };
 
     TileGenerator.Main.prototype.draw = function () {
@@ -32,9 +33,7 @@
         for (i = 0; i < this._algos.length; i += 1) {
             ctx = this._ui.getCtx(this._algos[i]);
             ctx.clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
-            console.time(this._algos[i].getId());
             this._algos[i].draw(ctx);
-            console.timeEnd(this._algos[i].getId());
         }
     };
 
@@ -54,6 +53,5 @@
     window.onload = function () {
         mainRef = new TileGenerator.Main();
         mainRef.onLoad();
-        mainRef.draw();
     };
 }());

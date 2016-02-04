@@ -44,6 +44,28 @@ var TileGenerator = {};
 (function () {
     'use strict';
 
+    TileGenerator.Dom = {};
+
+    TileGenerator.Dom.getParentNodeByClass = function (element, className) {
+        while ((element = element.parentNode) !== null) {
+            if (element.classList && element.classList.contains(className)) {
+                return element;
+            }
+        }
+        return null;
+    };
+
+    TileGenerator.Dom.getSiblingIndex = function (element) {
+        var index = 0;
+        while ((element = element.previousSibling) !== null) {
+            index += 1;
+        }
+        return index;
+    };
+}());
+(function () {
+    'use strict';
+
     TileGenerator.Hex = {};
 
     TileGenerator.Hex.Map = {
@@ -312,6 +334,7 @@ var TileGenerator = {};
             [160, 160],
             [192, 192]
         ];
+        this._map = null;
     };
 
     TileGenerator.Ui.prototype.onLoad = function () {
@@ -329,23 +352,34 @@ var TileGenerator = {};
         this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
         this._sizeElement.addEventListener('keyup', this._onKeySize.bind(this));
         this._addColorsFromSettings();
+        this._map = new TileGenerator.Map();
+        this._map.onLoad();
+    };
+
+    TileGenerator.Ui.prototype.onLoadEnd = function () {
+        this._redraw();
     };
 
     TileGenerator.Ui.prototype.addAlgoToDom = function (algo) {
         var canvas,
             ctx,
             deep = true,
+            description = algo.getDescription(),
             algoId = algo.getId(),
             title = algo.getTitle(),
             tpl;
         tpl = this._canvasContainerTplElement.cloneNode(deep);
         tpl.removeAttribute('id');
         tpl.setAttribute('class', 'canvas-container');
-        tpl.querySelector('.title').textContent = title;
+        tpl.querySelector('.canvas-title').textContent = title;
+        tpl.querySelector('.canvas-description').textContent = description;
         canvas = tpl.querySelector('canvas');
+        canvas.dataset.algoId = algoId;
         canvas.width = this._settings.getWidth();
         canvas.height = this._settings.getHeight();
         canvas.setAttribute('title', title);
+        canvas.addEventListener('click', this._onClickCanvas.bind(this));
+        canvas.addEventListener('keyup', this._onKeyCanvas.bind(this));
         ctx = canvas.getContext('2d');
         this._canvasList[algoId] = canvas;
         this._ctxList[algoId] = ctx;
@@ -358,6 +392,20 @@ var TileGenerator = {};
 
     TileGenerator.Ui.prototype.getCtx = function (algo) {
         return this._ctxList[algo.getId()];
+    };
+
+    TileGenerator.Ui.prototype._onClickCanvas = function (e) {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        this._map.show(e.target);
+    };
+
+    TileGenerator.Ui.prototype._onKeyCanvas = function (e) {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        if (e.which === 13) {
+            this._map.show(e.target);
+        }
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
@@ -373,8 +421,8 @@ var TileGenerator = {};
         var colorContainerElement,
             index;
         if (this._settings.getNumColors() > 1) {
-            colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
-            index = this._getSiblingIndex(colorContainerElement);
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
+            index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
             this._settings.removeColor(index)
                 .removeColorWeight(index);
             this._colorsElement.removeChild(colorContainerElement);
@@ -385,9 +433,9 @@ var TileGenerator = {};
     };
 
     TileGenerator.Ui.prototype._onChangeColor = function (e) {
-        var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container'),
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container'),
             index;
-        index = this._getSiblingIndex(colorContainerElement);
+        index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
         this._settings.updateColor(index, TileGenerator.Hex.simpleToDecArray(e.target.value));
         colorContainerElement.querySelector('.color-value').value = e.target.value;
         this._redraw();
@@ -398,7 +446,7 @@ var TileGenerator = {};
             colorElement,
             eventObj;
         if (TileGenerator.Hex.isSimpleHex(e.target.value)) {
-            colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
             colorElement = colorContainerElement.querySelector('.color');
             colorElement.value = e.target.value;
             eventObj = new Event('change');
@@ -410,22 +458,22 @@ var TileGenerator = {};
         var colorContainerElement,
             colorElement;
         if (!TileGenerator.Hex.isSimpleHex(e.target.value)) {
-            colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
             colorElement = colorContainerElement.querySelector('.color');
             e.target.value = colorElement.value;
         }
     };
 
     TileGenerator.Ui.prototype._onInputColorWeight = function (e) {
-        var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
         colorContainerElement.querySelector('.color-weight-value').textContent = e.target.value;
     };
 
     TileGenerator.Ui.prototype._onChangeColorWeight = function (e) {
-        var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container'),
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container'),
             colorWeight = parseInt(e.target.value, 10),
             index;
-        index = this._getSiblingIndex(colorContainerElement);
+        index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
         if (this._settings.getColorWeight(index) !== colorWeight) {
             this._settings.updateColorWeight(index, colorWeight);
             this._redraw();
@@ -505,23 +553,6 @@ var TileGenerator = {};
         }
     };
 
-    TileGenerator.Ui.prototype._getParentNodeByClass = function (element, className) {
-        while ((element = element.parentNode) !== null) {
-            if (element.classList.contains(className)) {
-                return element;
-            }
-        }
-        return null;
-    };
-
-    TileGenerator.Ui.prototype._getSiblingIndex = function (element) {
-        var index = 0;
-        while ((element = element.previousSibling) !== null) {
-            index += 1;
-        }
-        return index;
-    };
-
     TileGenerator.Ui.prototype._parseSize = function (value) {
         if (/^[1-9][0-9]*$/.test(value)) {
             return parseInt(value, 10);
@@ -538,6 +569,7 @@ var TileGenerator = {};
                 this._canvasList[i].height = this._settings.getHeight();
             }
         }
+        this._map.onResize();        
     };
 
     TileGenerator.Ui.prototype._populateSizes = function () {
@@ -556,6 +588,157 @@ var TileGenerator = {};
             }
         }
         matchedOption.setAttribute('selected', '');
+    };
+}());
+(function () {
+    'use strict';
+
+    TileGenerator.Map = function () {
+        this._settings = null;
+        this._dimElement = null;
+        this._mapElement = null;
+        this._mapCanvas = null;
+        this._mapCtx = null;
+        this._sourceCanvas = null;
+        this._previousElement = null;
+        this._nextElement = null;
+        this._closeElement = null;
+        this._closeHandler = this._onClickDim.bind(this);
+        this._keyHandler = this._onKeyDocument.bind(this);
+        this._previousHandler = this._onClickPrevious.bind(this);
+        this._nextHandler = this._onClickNext.bind(this);
+    };
+
+    TileGenerator.Map.NUM_X_TILES = 3;
+    TileGenerator.Map.NUM_Y_TILES = 3;
+
+    TileGenerator.Map.prototype.onLoad = function () {
+        this._settings = TileGenerator.Main.getRef().getSettings();
+        this._dimElement = document.getElementById('dim');
+        this._mapElement = document.getElementById('map');
+        this._previousElement = this._mapElement.querySelector('.map-link-previous');
+        this._nextElement = this._mapElement.querySelector('.map-link-next');
+        this._closeElement = this._mapElement.querySelector('.map-link-close');
+        this._createCanvas();
+    };
+
+    TileGenerator.Map.prototype.onResize = function () {
+        this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
+        this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
+    };
+
+    TileGenerator.Map.prototype.show = function (canvas) {
+        var dimElement = document.getElementById('dim'),
+            mapRect;
+        this._sourceCanvas = canvas;
+        dimElement.style.display = 'block';
+        this._mapElement.style.display = 'block';
+        this._nextElement.focus();
+        this._populate();
+        this._draw();
+        this._position();
+        document.addEventListener('keyup', this._keyHandler);
+        this._dimElement.addEventListener('click', this._closeHandler);
+        this._previousElement.addEventListener('click', this._previousHandler);
+        this._nextElement.addEventListener('click', this._nextHandler);
+        this._closeElement.addEventListener('click', this._closeHandler);
+    };
+
+    TileGenerator.Map.prototype._hide = function () {
+        var dimElement = document.getElementById('dim');
+        dimElement.style.display = 'none';
+        this._mapElement.style.display = 'none';
+        document.removeEventListener('keyup', this._keyHandler);
+        this._dimElement.removeEventListener('click', this._closeHandler);
+        this._previousElement.removeEventListener('click', this._previousHandler);
+        this._nextElement.removeEventListener('click', this._nextHandler);
+        this._closeElement.removeEventListener('click', this._closeHandler);
+    };
+
+    TileGenerator.Map.prototype._populate = function () {
+        var canvasContainerElement = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+        this._mapElement.querySelector('.map-title').textContent = canvasContainerElement.querySelector('.canvas-title').textContent;
+        this._mapElement.querySelector('.map-description').textContent = canvasContainerElement.querySelector('.canvas-description').textContent;
+    };
+
+    TileGenerator.Map.prototype._draw = function () {
+        var pattern = this._mapCtx.createPattern(this._sourceCanvas, 'repeat');
+        this._mapCtx.fillStyle = pattern;
+        this._mapCtx.fillRect(0, 0, this._mapCanvas.width, this._mapCanvas.height);
+    };
+
+    TileGenerator.Map.prototype._position = function () {
+        var mapRect = this._mapElement.getBoundingClientRect();
+        this._mapElement.style.left = Math.max(Math.floor((window.innerWidth - mapRect.width) / 2), 0) + 'px';
+        this._mapElement.style.top = Math.max(Math.floor((window.innerHeight - mapRect.height) / 2), 0) + 'px';
+    };
+
+    TileGenerator.Map.prototype._onKeyDocument = function (e) {
+        switch (e.which) {
+        case 27:
+            this._hide();
+            break;
+
+        case 37:
+            this._previous();
+            break;
+
+        case 39:
+            this._next();
+            break;
+        }
+    };
+
+    TileGenerator.Map.prototype._onClickDim = function (e) {
+        this._hide();
+        e.preventDefault();
+    };
+
+    TileGenerator.Map.prototype._onClickPrevious = function (e) {
+        this._previous();
+        e.preventDefault();
+    };
+
+    TileGenerator.Map.prototype._onClickNext = function (e) {
+        this._next();
+        e.preventDefault();
+    };
+
+    TileGenerator.Map.prototype._changeCanvas = function (canvas) {
+        this._sourceCanvas = canvas;
+        this._populate();
+        this._draw();
+    };
+
+    TileGenerator.Map.prototype._previous = function () {
+        var canvasesParent,
+            prevContainer,
+            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+        prevContainer = sourceContainer.previousSibling;
+        if (!prevContainer) {
+            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'canvases-dynamic');
+            prevContainer = canvasesParent.lastChild;
+        }
+        this._changeCanvas(prevContainer.querySelector('canvas'));
+    };
+
+    TileGenerator.Map.prototype._next = function () {
+        var canvasesParent,
+            nextContainer,
+            sourceContainer = TileGenerator.Dom.getParentNodeByClass(this._sourceCanvas, 'canvas-container');
+        nextContainer = sourceContainer.nextSibling;
+        if (!nextContainer) {
+            canvasesParent = TileGenerator.Dom.getParentNodeByClass(sourceContainer, 'canvases-dynamic');
+            nextContainer = canvasesParent.firstChild;
+        }
+        this._changeCanvas(nextContainer.querySelector('canvas'));
+    };
+
+    TileGenerator.Map.prototype._createCanvas = function () {
+        this._mapCanvas = document.getElementById('map-canvas');
+        this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
+        this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
+        this._mapCtx = this._mapCanvas.getContext('2d');
     };
 }());
 (function () {
@@ -584,6 +767,7 @@ var TileGenerator = {};
             ctx = this._ui.getCtx(this._algos[i]);
             this._algos[i].setup(ctx);
         }
+        this._ui.onLoadEnd();
     };
 
     TileGenerator.Main.prototype.draw = function () {
@@ -592,9 +776,7 @@ var TileGenerator = {};
         for (i = 0; i < this._algos.length; i += 1) {
             ctx = this._ui.getCtx(this._algos[i]);
             ctx.clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
-            console.time(this._algos[i].getId());
             this._algos[i].draw(ctx);
-            console.timeEnd(this._algos[i].getId());
         }
     };
 
@@ -614,7 +796,6 @@ var TileGenerator = {};
     window.onload = function () {
         mainRef = new TileGenerator.Main();
         mainRef.onLoad();
-        mainRef.draw();
     };
 }());
 (function () {
@@ -624,6 +805,7 @@ var TileGenerator = {};
         this._settings = settings;
         this._id = null;
         this._title = null;
+        this._description = null;
         this._imageData = null;
         this._imageDataArray = null;
         this._imageDataModified = false;
@@ -648,6 +830,10 @@ var TileGenerator = {};
 
     TileGenerator.Algo.prototype.getTitle = function () {
         return this._title;
+    };
+
+    TileGenerator.Algo.prototype.getDescription = function () {
+        return this._description;
     };
 
     TileGenerator.Algo.prototype._setPixel = function (ctx, position, color) {
@@ -682,6 +868,7 @@ var TileGenerator = {};
         parent.call(this, settings);
         this._id = 'random';
         this._title = 'Random';
+        this._description = 'Pixels are assigned a random color.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoRandom);
@@ -712,6 +899,7 @@ var TileGenerator = {};
         parent.call(this, settings);
         this._id = 'smearing';
         this._title = 'Smearing';
+        this._description = 'Pixels are assigned a continuous set of colors in random amounts.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoSmearing);
@@ -754,6 +942,7 @@ var TileGenerator = {};
         parent.call(this, settings);
         this._id = 'brick';
         this._title = 'Brick';
+        this._description = 'Rectangles and lines create bricks.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoBrick);
@@ -786,9 +975,9 @@ var TileGenerator = {};
         if (brickHexColors.length === 0) {
             brickHexColors.push(outlineHexColor);
         }
-        brickWidth = Math.floor(this._settings.getWidth() / 8);
+        brickWidth = Math.floor(this._settings.getWidth() / 4);
         halfBrickWidth = Math.floor(brickWidth / 2);
-        brickHeight = Math.floor(this._settings.getHeight() / 16);
+        brickHeight = Math.floor(this._settings.getHeight() / 8);
         numBricksX = Math.floor(this._settings.getWidth() / brickWidth);
         numBricksY = Math.floor(this._settings.getHeight() / brickHeight);
         ctx.strokeStyle = outlineHexColor;
@@ -906,6 +1095,7 @@ var TileGenerator = {};
         parent.call(this, settings);
         this._id = 'neighbor4';
         this._title = 'Neighbor 4';
+        this._description = 'Pixel colors are based off 4 neighboring pixels (north, south, east, and west).';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor4);
@@ -948,6 +1138,7 @@ var TileGenerator = {};
         parent.call(this, settings);
         this._id = 'neighbor8';
         this._title = 'Neighbor 8';
+        this._description = 'Pixel colors are based off 8 neighboring pixels.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor8);

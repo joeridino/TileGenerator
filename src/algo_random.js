@@ -7,6 +7,7 @@
         parent.call(this, settings);
         this._id = 'random';
         this._title = 'Random';
+        this._description = 'Pixels are assigned a random color.';
     };
 
     TileGenerator.Util.extend(parent, TileGenerator.AlgoRandom);

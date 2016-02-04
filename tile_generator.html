@@ -10,8 +10,9 @@
       <div id="canvases" class="canvases">
           <div id="canvases-dynamic" class="canvases-dynamic"></div>
           <div id="canvas-container-template" class="canvas-container-template">
-              <p class="title"></p>
-              <canvas></canvas>
+              <h2 class="canvas-title"></h2>
+              <p class="canvas-description"></p>
+              <canvas tabindex="0"></canvas>
           </div>
           <div class="clearfix"></div>
       </div>
@@ -40,5 +41,17 @@
           </div>
           <div class="clearfix"></div>
       </div>
+      <div id="map" class="map">
+          <h2 class="map-title"></h2>
+          <p class="map-description"></p>
+          <canvas id="map-canvas"></canvas>
+          <div class="map-links">
+              <a href="" class="map-link map-link-previous">previous</a>
+              <a href="" class="map-link map-link-next">next</a>
+              <a href="" class="map-link map-link-close">close</a>
+              <div class="clearfix"></div>
+          </div>
+      </div>
+      <div id="dim" class="dim"></div>
     </body>
 </html>

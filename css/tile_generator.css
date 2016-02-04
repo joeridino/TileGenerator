@@ -2,15 +2,20 @@
     clear: both;
 }
 
-.canvases {
-}
-
-.canvases .title {
-
+.dim {
+    background-color: #fff;
+    display: none;
+    height: 100%;
+    left: 0;
+    opacity: 0.8;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 .canvases canvas {
-
+    cursor: pointer;
 }
 
 .canvases .canvas-container-template {
@@ -25,10 +30,9 @@
     margin-right: 10px;
 }
 
-.canvases .canvas-container p {
+.canvases .canvas-container .canvas-title,
+.canvases .canvas-container .canvas-description {
     display: none;
-    margin-top: 0;
-    font-weight: bold;
 }
 
 .controls {
@@ -88,6 +92,32 @@
 
 .controls .colors .color-container .remove-color-btn {
     margin-left: 10px;
+}
+
+.map {
+    background-color: #333;
+    color: #fff;
+    display: none;
+    padding: 20px;
+    position: absolute;
+    z-index: 2000;
+}
+
+.map h2 {
+    margin: 0 0 10px;
+}
+
+.map .map-links {
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+.map .map-links .map-link {
+    color: #fff;
+}
+
+.map .map-links .map-link:not(:last-of-type) {
+    margin-right: 10px;
 }
 
 @media (max-width: 440px) {

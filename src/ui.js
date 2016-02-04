@@ -20,6 +20,7 @@
             [160, 160],
             [192, 192]
         ];
+        this._map = null;
     };
 
     TileGenerator.Ui.prototype.onLoad = function () {
@@ -37,23 +38,34 @@
         this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
         this._sizeElement.addEventListener('keyup', this._onKeySize.bind(this));
         this._addColorsFromSettings();
+        this._map = new TileGenerator.Map();
+        this._map.onLoad();
+    };
+
+    TileGenerator.Ui.prototype.onLoadEnd = function () {
+        this._redraw();
     };
 
     TileGenerator.Ui.prototype.addAlgoToDom = function (algo) {
         var canvas,
             ctx,
             deep = true,
+            description = algo.getDescription(),
             algoId = algo.getId(),
             title = algo.getTitle(),
             tpl;
         tpl = this._canvasContainerTplElement.cloneNode(deep);
         tpl.removeAttribute('id');
         tpl.setAttribute('class', 'canvas-container');
-        tpl.querySelector('.title').textContent = title;
+        tpl.querySelector('.canvas-title').textContent = title;
+        tpl.querySelector('.canvas-description').textContent = description;
         canvas = tpl.querySelector('canvas');
+        canvas.dataset.algoId = algoId;
         canvas.width = this._settings.getWidth();
         canvas.height = this._settings.getHeight();
         canvas.setAttribute('title', title);
+        canvas.addEventListener('click', this._onClickCanvas.bind(this));
+        canvas.addEventListener('keyup', this._onKeyCanvas.bind(this));
         ctx = canvas.getContext('2d');
         this._canvasList[algoId] = canvas;
         this._ctxList[algoId] = ctx;
@@ -66,6 +78,20 @@
 
     TileGenerator.Ui.prototype.getCtx = function (algo) {
         return this._ctxList[algo.getId()];
+    };
+
+    TileGenerator.Ui.prototype._onClickCanvas = function (e) {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        this._map.show(e.target);
+    };
+
+    TileGenerator.Ui.prototype._onKeyCanvas = function (e) {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        if (e.which === 13) {
+            this._map.show(e.target);
+        }
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
@@ -81,8 +107,8 @@
         var colorContainerElement,
             index;
         if (this._settings.getNumColors() > 1) {
-            colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
-            index = this._getSiblingIndex(colorContainerElement);
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
+            index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
             this._settings.removeColor(index)
                 .removeColorWeight(index);
             this._colorsElement.removeChild(colorContainerElement);
@@ -93,9 +119,9 @@
     };
 
     TileGenerator.Ui.prototype._onChangeColor = function (e) {
-        var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container'),
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container'),
             index;
-        index = this._getSiblingIndex(colorContainerElement);
+        index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
         this._settings.updateColor(index, TileGenerator.Hex.simpleToDecArray(e.target.value));
         colorContainerElement.querySelector('.color-value').value = e.target.value;
         this._redraw();
@@ -106,7 +132,7 @@
             colorElement,
             eventObj;
         if (TileGenerator.Hex.isSimpleHex(e.target.value)) {
-            colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
             colorElement = colorContainerElement.querySelector('.color');
             colorElement.value = e.target.value;
             eventObj = new Event('change');
@@ -118,22 +144,22 @@
         var colorContainerElement,
             colorElement;
         if (!TileGenerator.Hex.isSimpleHex(e.target.value)) {
-            colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
+            colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
             colorElement = colorContainerElement.querySelector('.color');
             e.target.value = colorElement.value;
         }
     };
 
     TileGenerator.Ui.prototype._onInputColorWeight = function (e) {
-        var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container');
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container');
         colorContainerElement.querySelector('.color-weight-value').textContent = e.target.value;
     };
 
     TileGenerator.Ui.prototype._onChangeColorWeight = function (e) {
-        var colorContainerElement = this._getParentNodeByClass(e.target, 'color-container'),
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'color-container'),
             colorWeight = parseInt(e.target.value, 10),
             index;
-        index = this._getSiblingIndex(colorContainerElement);
+        index = TileGenerator.Dom.getSiblingIndex(colorContainerElement);
         if (this._settings.getColorWeight(index) !== colorWeight) {
             this._settings.updateColorWeight(index, colorWeight);
             this._redraw();
@@ -213,23 +239,6 @@
         }
     };
 
-    TileGenerator.Ui.prototype._getParentNodeByClass = function (element, className) {
-        while ((element = element.parentNode) !== null) {
-            if (element.classList.contains(className)) {
-                return element;
-            }
-        }
-        return null;
-    };
-
-    TileGenerator.Ui.prototype._getSiblingIndex = function (element) {
-        var index = 0;
-        while ((element = element.previousSibling) !== null) {
-            index += 1;
-        }
-        return index;
-    };
-
     TileGenerator.Ui.prototype._parseSize = function (value) {
         if (/^[1-9][0-9]*$/.test(value)) {
             return parseInt(value, 10);
@@ -246,6 +255,7 @@
                 this._canvasList[i].height = this._settings.getHeight();
             }
         }
+        this._map.onResize();        
     };
 
     TileGenerator.Ui.prototype._populateSizes = function () {
