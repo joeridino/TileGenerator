@@ -10,7 +10,7 @@
         this._description = 'Rectangles and lines create bricks.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoBrick);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoBrick);
 
     TileGenerator.AlgoBrick.prototype.draw = function (ctx) {
         var brickHexColors = [],

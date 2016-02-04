@@ -10,7 +10,7 @@
         this._description = 'Pixel colors are based off 8 neighboring pixels.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor8);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoNeighbor8);
 
     TileGenerator.AlgoNeighbor8.prototype._getNeighbors = function (x, y) {
         var neighbors = parent.prototype._getNeighbors.call(this, x, y);

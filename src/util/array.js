@@ -1,14 +1,9 @@
 (function () {
     'use strict';
 
-    TileGenerator.Util = {};
+    TileGenerator.Array = {};
 
-    TileGenerator.Util.extend = function (parent, child) {
-        child.prototype = Object.create(parent.prototype);
-        child.prototype.constructor = child;
-    };
-
-    TileGenerator.Util.randomizeArray = function (a) {
+    TileGenerator.Array.randomize = function (a) {
         var i,
             len = a.length,
             r,
@@ -21,7 +16,7 @@
             len -= 1;
         }
     };
-    TileGenerator.Util.getRandomWeightedIndex = function (a) {
+    TileGenerator.Array.getRandomWeightedIndex = function (a) {
         var dataArraySum = 0,
             i,
             loopSum = 0,

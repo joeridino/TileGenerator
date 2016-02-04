@@ -10,7 +10,7 @@
         this._description = 'Pixel colors are based off 4 neighboring pixels (north, south, east, and west).';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor4);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoNeighbor4);
 
     TileGenerator.AlgoNeighbor4.prototype._getNeighbors = function (x, y) {
         var neighbors = [];

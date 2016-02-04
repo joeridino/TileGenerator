@@ -2,14 +2,19 @@ var TileGenerator = {};
 (function () {
     'use strict';
 
-    TileGenerator.Util = {};
+    TileGenerator.Oop = {};
 
-    TileGenerator.Util.extend = function (parent, child) {
+    TileGenerator.Oop.extend = function (parent, child) {
         child.prototype = Object.create(parent.prototype);
         child.prototype.constructor = child;
     };
+}());
+(function () {
+    'use strict';
 
-    TileGenerator.Util.randomizeArray = function (a) {
+    TileGenerator.Array = {};
+
+    TileGenerator.Array.randomize = function (a) {
         var i,
             len = a.length,
             r,
@@ -22,7 +27,7 @@ var TileGenerator = {};
             len -= 1;
         }
     };
-    TileGenerator.Util.getRandomWeightedIndex = function (a) {
+    TileGenerator.Array.getRandomWeightedIndex = function (a) {
         var dataArraySum = 0,
             i,
             loopSum = 0,
@@ -310,6 +315,63 @@ var TileGenerator = {};
             colors.push(TileGenerator.Hex.simpleToDecArray(hexColors[i]));
         }
         return colors;
+    };
+}());
+(function () {
+    'use strict';
+
+    var mainRef = null;
+
+    TileGenerator.Main = function () {
+        this._settings = new TileGenerator.Settings();
+        this._ui = new TileGenerator.Ui();
+        this._algos = null;
+    };
+
+    TileGenerator.Main.getRef = function () {
+        return mainRef;
+    };
+
+    TileGenerator.Main.prototype.onLoad = function () {
+        var ctx,
+            i;
+        this._settings.onLoad();
+        this._ui.onLoad();
+        this._algos = TileGenerator.AlgoFactory.getAlgoInstances();
+        for (i = 0; i < this._algos.length; i += 1) {
+            this._ui.addAlgoToDom(this._algos[i]);
+            ctx = this._ui.getCtx(this._algos[i]);
+            this._algos[i].setup(ctx);
+        }
+        this._ui.onLoadEnd();
+    };
+
+    TileGenerator.Main.prototype.draw = function () {
+        var ctx,
+            i;
+        for (i = 0; i < this._algos.length; i += 1) {
+            ctx = this._ui.getCtx(this._algos[i]);
+            ctx.clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
+            this._algos[i].draw(ctx);
+        }
+    };
+
+    TileGenerator.Main.prototype.resized = function () {
+        var ctx,
+            i;
+        for (i = 0; i < this._algos.length; i += 1) {
+            ctx = this._ui.getCtx(this._algos[i]);
+            this._algos[i].resized(ctx);
+        }
+    };
+
+    TileGenerator.Main.prototype.getSettings = function () {
+        return this._settings;
+    };
+
+    window.onload = function () {
+        mainRef = new TileGenerator.Main();
+        mainRef.onLoad();
     };
 }());
 (function () {
@@ -743,63 +805,6 @@ var TileGenerator = {};
 (function () {
     'use strict';
 
-    var mainRef = null;
-
-    TileGenerator.Main = function () {
-        this._settings = new TileGenerator.Settings();
-        this._ui = new TileGenerator.Ui();
-        this._algos = null;
-    };
-
-    TileGenerator.Main.getRef = function () {
-        return mainRef;
-    };
-
-    TileGenerator.Main.prototype.onLoad = function () {
-        var ctx,
-            i;
-        this._settings.onLoad();
-        this._ui.onLoad();
-        this._algos = TileGenerator.AlgoFactory.getAlgoInstances();
-        for (i = 0; i < this._algos.length; i += 1) {
-            this._ui.addAlgoToDom(this._algos[i]);
-            ctx = this._ui.getCtx(this._algos[i]);
-            this._algos[i].setup(ctx);
-        }
-        this._ui.onLoadEnd();
-    };
-
-    TileGenerator.Main.prototype.draw = function () {
-        var ctx,
-            i;
-        for (i = 0; i < this._algos.length; i += 1) {
-            ctx = this._ui.getCtx(this._algos[i]);
-            ctx.clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
-            this._algos[i].draw(ctx);
-        }
-    };
-
-    TileGenerator.Main.prototype.resized = function () {
-        var ctx,
-            i;
-        for (i = 0; i < this._algos.length; i += 1) {
-            ctx = this._ui.getCtx(this._algos[i]);
-            this._algos[i].resized(ctx);
-        }
-    };
-
-    TileGenerator.Main.prototype.getSettings = function () {
-        return this._settings;
-    };
-
-    window.onload = function () {
-        mainRef = new TileGenerator.Main();
-        mainRef.onLoad();
-    };
-}());
-(function () {
-    'use strict';
-
     TileGenerator.Algo = function (settings) {
         this._settings = settings;
         this._id = null;
@@ -870,7 +875,7 @@ var TileGenerator = {};
         this._description = 'Pixels are assigned a random color.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoRandom);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoRandom);
 
     TileGenerator.AlgoRandom.prototype._setPixels = function (ctx) {
         var colorIndex,
@@ -883,7 +888,7 @@ var TileGenerator = {};
             for (x = 0; x < this._settings.getWidth(); x += 1) {
                 position.x = x;
                 position.y = y;
-                colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                 this._setPixel(ctx, position, colors[colorIndex]);
             }
         }
@@ -901,7 +906,7 @@ var TileGenerator = {};
         this._description = 'Pixels are assigned a continuous set of colors in random amounts.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoSmearing);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoSmearing);
 
     TileGenerator.AlgoSmearing.prototype._setPixels = function (ctx) {
         var colorIndex,
@@ -917,7 +922,7 @@ var TileGenerator = {};
         for (y = 0; y < this._settings.getHeight(); y += 1) {
             for (x = 0; x < this._settings.getWidth(); x += 1) {
                 if (needColorChange) {
-                    colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                     colorContinueCount = 0;
                     needColorChange = false;
                 }
@@ -944,7 +949,7 @@ var TileGenerator = {};
         this._description = 'Rectangles and lines create bricks.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoBrick);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoBrick);
 
     TileGenerator.AlgoBrick.prototype.draw = function (ctx) {
         var brickHexColors = [],
@@ -1007,7 +1012,7 @@ var TileGenerator = {};
         parent.call(this, settings);
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoNeighbor);
 
     TileGenerator.AlgoNeighbor.prototype._setPixels = function (ctx) {
         var color,
@@ -1025,7 +1030,7 @@ var TileGenerator = {};
             rows.push(y);
         }
         maxSameColorCount = Math.floor(this._settings.getWidth() / 10);
-        TileGenerator.Util.randomizeArray(rows);
+        TileGenerator.Array.randomize(rows);
         if (this._imageDataModified) {
             this._createImageData(ctx);
         }
@@ -1033,7 +1038,7 @@ var TileGenerator = {};
             for (x = 0; x < this._settings.getWidth(); x += 1) {
                 color = this._getRandomNeighborColor(ctx, x, y);
                 if (color === null) {
-                    colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                     color = colors[colorIndex];
                 }
                 if (this._colorMatch(color, lastColor)) {
@@ -1041,7 +1046,7 @@ var TileGenerator = {};
                 }
                 if (sameColorCount > maxSameColorCount) {
                     sameColorCount = 0;
-                    colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                     color = colors[colorIndex];
                 }
                 lastColor = color;
@@ -1060,7 +1065,7 @@ var TileGenerator = {};
         if (neighbors.length === 0) {
             return null;
         }
-        TileGenerator.Util.randomizeArray(neighbors);
+        TileGenerator.Array.randomize(neighbors);
         for (i = 0; i < neighbors.length; i += 1) {
             pixelIndex = this._getPixelIndex(ctx, neighbors[i].x, neighbors[i].y);
             if (this._imageDataArray[pixelIndex + 3] !== 0) {
@@ -1097,7 +1102,7 @@ var TileGenerator = {};
         this._description = 'Pixel colors are based off 4 neighboring pixels (north, south, east, and west).';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor4);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoNeighbor4);
 
     TileGenerator.AlgoNeighbor4.prototype._getNeighbors = function (x, y) {
         var neighbors = [];
@@ -1140,7 +1145,7 @@ var TileGenerator = {};
         this._description = 'Pixel colors are based off 8 neighboring pixels.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor8);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoNeighbor8);
 
     TileGenerator.AlgoNeighbor8.prototype._getNeighbors = function (x, y) {
         var neighbors = parent.prototype._getNeighbors.call(this, x, y);

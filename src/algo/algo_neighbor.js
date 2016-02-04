@@ -7,7 +7,7 @@
         parent.call(this, settings);
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoNeighbor);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoNeighbor);
 
     TileGenerator.AlgoNeighbor.prototype._setPixels = function (ctx) {
         var color,
@@ -25,7 +25,7 @@
             rows.push(y);
         }
         maxSameColorCount = Math.floor(this._settings.getWidth() / 10);
-        TileGenerator.Util.randomizeArray(rows);
+        TileGenerator.Array.randomize(rows);
         if (this._imageDataModified) {
             this._createImageData(ctx);
         }
@@ -33,7 +33,7 @@
             for (x = 0; x < this._settings.getWidth(); x += 1) {
                 color = this._getRandomNeighborColor(ctx, x, y);
                 if (color === null) {
-                    colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                     color = colors[colorIndex];
                 }
                 if (this._colorMatch(color, lastColor)) {
@@ -41,7 +41,7 @@
                 }
                 if (sameColorCount > maxSameColorCount) {
                     sameColorCount = 0;
-                    colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                    colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                     color = colors[colorIndex];
                 }
                 lastColor = color;
@@ -60,7 +60,7 @@
         if (neighbors.length === 0) {
             return null;
         }
-        TileGenerator.Util.randomizeArray(neighbors);
+        TileGenerator.Array.randomize(neighbors);
         for (i = 0; i < neighbors.length; i += 1) {
             pixelIndex = this._getPixelIndex(ctx, neighbors[i].x, neighbors[i].y);
             if (this._imageDataArray[pixelIndex + 3] !== 0) {

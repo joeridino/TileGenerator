@@ -10,7 +10,7 @@
         this._description = 'Pixels are assigned a random color.';
     };
 
-    TileGenerator.Util.extend(parent, TileGenerator.AlgoRandom);
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoRandom);
 
     TileGenerator.AlgoRandom.prototype._setPixels = function (ctx) {
         var colorIndex,
@@ -23,7 +23,7 @@
             for (x = 0; x < this._settings.getWidth(); x += 1) {
                 position.x = x;
                 position.y = y;
-                colorIndex = TileGenerator.Util.getRandomWeightedIndex(colorWeights);
+                colorIndex = TileGenerator.Array.getRandomWeightedIndex(colorWeights);
                 this._setPixel(ctx, position, colors[colorIndex]);
             }
         }
