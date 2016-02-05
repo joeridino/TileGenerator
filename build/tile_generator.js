@@ -682,6 +682,7 @@ var TileGenerator = {};
         this._nextElement = this._mapElement.querySelector('.tg-map-link-next');
         this._closeElement = this._mapElement.querySelector('.tg-map-link-close');
         this._createCanvas();
+        this._reorderDom();
     };
 
     TileGenerator.Map.prototype.onResize = function () {
@@ -734,7 +735,6 @@ var TileGenerator = {};
     };
 
     TileGenerator.Map.prototype._onKeyDocument = function (e) {
-        console.log(e.which);
         switch (e.which) {
         case 27:
             this._hide();
@@ -800,6 +800,16 @@ var TileGenerator = {};
         this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
         this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
         this._mapCtx = this._mapCanvas.getContext('2d');
+    };
+
+    TileGenerator.Map.prototype._reorderDom = function () {
+        if (this._mapElement.parentNode === document.body) {
+            return;
+        }
+        this._mapElement.parentNode.removeChild(this._mapElement);
+        this._dimElement.parentNode.removeChild(this._dimElement);
+        document.body.appendChild(this._mapElement);
+        document.body.appendChild(this._dimElement);
     };
 }());
 (function () {
