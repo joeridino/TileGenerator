@@ -36,14 +36,13 @@
     };
 
     TileGenerator.Map.prototype.show = function (canvas) {
-        var mapRect;
         this._sourceCanvas = canvas;
         this._dimElement.style.display = 'block';
         this._mapElement.style.display = 'block';
-        this._nextElement.focus();
         this._populate();
         this._draw();
         this._position();
+        this._nextElement.focus();
         document.addEventListener('keyup', this._keyHandler);
         this._dimElement.addEventListener('click', this._closeHandler);
         this._previousElement.addEventListener('click', this._previousHandler);
@@ -76,11 +75,12 @@
 
     TileGenerator.Map.prototype._position = function () {
         var mapRect = this._mapElement.getBoundingClientRect();
-        this._mapElement.style.left = Math.max(Math.floor((window.innerWidth - mapRect.width) / 2), 0) + 'px';
-        this._mapElement.style.top = Math.max(Math.floor((window.innerHeight - mapRect.height) / 2), 0) + 'px';
+        this._mapElement.style.left = Math.max(Math.floor((window.innerWidth - mapRect.width) / 2) + window.pageXOffset, 0) + 'px';
+        this._mapElement.style.top = Math.max(Math.floor((window.innerHeight - mapRect.height) / 2) + window.pageYOffset, 0) + 'px';
     };
 
     TileGenerator.Map.prototype._onKeyDocument = function (e) {
+        console.log(e.which);
         switch (e.which) {
         case 27:
             this._hide();
