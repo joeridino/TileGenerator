@@ -45,6 +45,13 @@
         this._imageDataModified = true;
     };
 
+    TileGenerator.Algo.prototype._setBlockPixels = function (ctx, positions, color) {
+        var i;
+        for (i = 0; i < positions.length; i += 1) {
+            this._setPixel(ctx, positions[i], color);
+        }
+    };
+
     TileGenerator.Algo.prototype._getPixelIndex = function (ctx, x, y) {
         return (y * ctx.canvas.width + x) * 4;
     };

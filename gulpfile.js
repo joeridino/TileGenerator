@@ -25,6 +25,7 @@ var jsFiles = [
     'algo/algo_neighbor.js',
     'algo/algo_neighbor4.js',
     'algo/algo_neighbor8.js',
+    'algo/algo_pixellation.js',
     'algo/algo_factory.js',
 ];
 var i;
