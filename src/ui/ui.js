@@ -95,12 +95,12 @@
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
-        var simpleColor = this._colorContainerTplElement.querySelector('.tg-color').value,
-            colorWeight = parseInt(this._colorContainerTplElement.querySelector('.tg-color-weight-range').value, 10);
-        this._addColorToDom(simpleColor, colorWeight);
-        this._settings.addColor(TileGenerator.Hex.simpleToDecArray(simpleColor))
-            .addColorWeight(colorWeight);
-        this._redraw();
+        this._cloneColor(this._colorContainerTplElement);
+    };
+
+    TileGenerator.Ui.prototype._onCloneColor = function (e) {
+        var colorContainerElement = TileGenerator.Dom.getParentNodeByClass(e.target, 'tg-color-container');
+        this._cloneColor(colorContainerElement);
     };
 
     TileGenerator.Ui.prototype._onRemoveColor = function (e) {
@@ -200,6 +200,17 @@
         TileGenerator.Main.getRef().draw();
     };
 
+    TileGenerator.Ui.prototype._cloneColor = function (colorContainerElement) {
+        var colorWeight,
+            simpleColor;
+        simpleColor = colorContainerElement.querySelector('.tg-color').value;
+        colorWeight = parseInt(colorContainerElement.querySelector('.tg-color-weight-range').value, 10);
+        this._addColorToDom(simpleColor, colorWeight);
+        this._settings.addColor(TileGenerator.Hex.simpleToDecArray(simpleColor))
+            .addColorWeight(colorWeight);
+        this._redraw();
+    };
+
     TileGenerator.Ui.prototype._addColorToDom = function (simpleColor, colorWeight) {
         var colorElement,
             colorValueElement,
@@ -218,6 +229,7 @@
         colorValueElement.value = simpleColor;
         colorWeightElement.value = colorWeight;
         colorWeightValueElement.textContent = colorWeight;
+        tpl.querySelector('.tg-clone-color-btn').addEventListener('click', this._onCloneColor.bind(this));
         tpl.querySelector('.tg-remove-color-btn').addEventListener('click', this._onRemoveColor.bind(this));
         colorElement.addEventListener('change', this._onChangeColor.bind(this));
         colorValueElement.addEventListener('input', this._onInputColorValue.bind(this));

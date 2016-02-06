@@ -73,6 +73,11 @@
     display: inline-block;
 }
 
+.tg-controls .tg-colors .tg-color-container .tg-color-buttons {
+    display: inline-block;
+    margin-left: 10px;
+}
+
 .tg-controls .tg-colors .tg-color-container .tg-color-weight-label {
     margin-left: 5px;
 }
@@ -120,7 +125,7 @@
     margin-right: 10px;
 }
 
-@media (max-width: 440px) {
+@media (max-width: 500px) {
     .tg-controls .tg-colors .tg-color-container .tg-color-weight-combo {
         clear: both;
         display: block;
@@ -130,7 +135,8 @@
         margin-left: 0px;
     }
 
-    .tg-controls .tg-colors .tg-color-container .tg-remove-color-btn {
+    .tg-controls .tg-colors .tg-color-container .tg-color-buttons {
+        clear: both;
         margin-left: 0px;
     }
 }
