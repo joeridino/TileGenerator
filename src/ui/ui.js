@@ -38,7 +38,7 @@
         this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
         this._sizeElement.addEventListener('keyup', this._onKeySize.bind(this));
         this._addColorsFromSettings();
-        this._map = new TileGenerator.Map();
+        this._map = new TileGenerator.Map(this);
         this._map.onLoad();
     };
 
@@ -70,14 +70,11 @@
         this._canvasList[algoId] = canvas;
         this._ctxList[algoId] = ctx;
         this._canvasesElement.appendChild(tpl);
+        algo.setup(ctx);
     };
 
-    TileGenerator.Ui.prototype.getCanvas = function (algo) {
-        return this._canvasList[algo.getId()];
-    };
-
-    TileGenerator.Ui.prototype.getCtx = function (algo) {
-        return this._ctxList[algo.getId()];
+    TileGenerator.Ui.prototype.redrawAlgo = function (algoId) {
+        this._redrawAlgo(algoId);
     };
 
     TileGenerator.Ui.prototype._onClickCanvas = function (e) {
@@ -183,7 +180,7 @@
             this._settings.setWidth(size[0])
                 .setHeight(size[1]);
             this._resizeCanvases();
-            TileGenerator.Main.getRef().resized();
+            this._callAlgoResized();
             this._redraw();
         }
     };
@@ -197,7 +194,18 @@
     };
 
     TileGenerator.Ui.prototype._redraw = function () {
-        TileGenerator.Main.getRef().draw();
+        var i;
+        for (i in this._ctxList) {
+            if (this._ctxList.hasOwnProperty(i)) {
+                this._redrawAlgo(i);
+            }
+        }
+    };
+
+    TileGenerator.Ui.prototype._redrawAlgo = function (algoId) {
+        var algo = TileGenerator.Main.getRef().getAlgo(algoId);
+        this._ctxList[algoId].clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
+        algo.draw(this._ctxList[algoId]);
     };
 
     TileGenerator.Ui.prototype._cloneColor = function (colorContainerElement) {
@@ -268,6 +276,17 @@
             }
         }
         this._map.onResize();        
+    };
+
+    TileGenerator.Ui.prototype._callAlgoResized = function () {
+        var algo,
+            i;
+        for (i in this._ctxList) {
+            if (this._ctxList.hasOwnProperty(i)) {
+                algo = TileGenerator.Main.getRef().getAlgo(i);
+                algo.resized(this._ctxList[i]);
+            }
+        }
     };
 
     TileGenerator.Ui.prototype._populateSizes = function () {

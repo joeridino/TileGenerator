@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    TileGenerator.Map = function () {
+    TileGenerator.Map = function (ui) {
+        this._ui = ui;
         this._settings = null;
         this._dimElement = null;
         this._mapElement = null;
@@ -11,10 +12,12 @@
         this._previousElement = null;
         this._nextElement = null;
         this._closeElement = null;
+        this._redrawElement = null;
         this._closeHandler = this._onClickDim.bind(this);
         this._keyHandler = this._onKeyDocument.bind(this);
         this._previousHandler = this._onClickPrevious.bind(this);
         this._nextHandler = this._onClickNext.bind(this);
+        this._redrawHandler = this._onClickRedraw.bind(this);
     };
 
     TileGenerator.Map.NUM_X_TILES = 3;
@@ -27,8 +30,9 @@
         this._previousElement = this._mapElement.querySelector('.tg-map-link-previous');
         this._nextElement = this._mapElement.querySelector('.tg-map-link-next');
         this._closeElement = this._mapElement.querySelector('.tg-map-link-close');
+        this._redrawElement = this._mapElement.querySelector('.tg-map-link-redraw');
         this._createCanvas();
-        this._reorderDom();
+        this._rearrangeDom();
     };
 
     TileGenerator.Map.prototype.onResize = function () {
@@ -49,6 +53,7 @@
         this._previousElement.addEventListener('click', this._previousHandler);
         this._nextElement.addEventListener('click', this._nextHandler);
         this._closeElement.addEventListener('click', this._closeHandler);
+        this._redrawElement.addEventListener('click', this._redrawHandler);
     };
 
     TileGenerator.Map.prototype._hide = function () {
@@ -60,6 +65,7 @@
         this._previousElement.removeEventListener('click', this._previousHandler);
         this._nextElement.removeEventListener('click', this._nextHandler);
         this._closeElement.removeEventListener('click', this._closeHandler);
+        this._redrawElement.removeEventListener('click', this._redrawHandler);
     };
 
     TileGenerator.Map.prototype._populate = function () {
@@ -111,6 +117,12 @@
         e.preventDefault();
     };
 
+    TileGenerator.Map.prototype._onClickRedraw = function (e) {
+        this._ui.redrawAlgo(this._sourceCanvas.dataset.algoId);
+        this._draw();
+        e.preventDefault();
+    };
+
     TileGenerator.Map.prototype._changeCanvas = function (canvas) {
         this._sourceCanvas = canvas;
         this._populate();
@@ -148,7 +160,7 @@
         this._mapCtx = this._mapCanvas.getContext('2d');
     };
 
-    TileGenerator.Map.prototype._reorderDom = function () {
+    TileGenerator.Map.prototype._rearrangeDom = function () {
         if (this._mapElement.parentNode === document.body) {
             return;
         }

@@ -6,7 +6,7 @@
     TileGenerator.Main = function () {
         this._settings = new TileGenerator.Settings();
         this._ui = new TileGenerator.Ui();
-        this._algos = null;
+        this._algos = {};
     };
 
     TileGenerator.Main.getRef = function () {
@@ -14,36 +14,20 @@
     };
 
     TileGenerator.Main.prototype.onLoad = function () {
-        var ctx,
+        var algos,
             i;
         this._settings.onLoad();
         this._ui.onLoad();
-        this._algos = TileGenerator.AlgoFactory.getAlgoInstances();
-        for (i = 0; i < this._algos.length; i += 1) {
-            this._ui.addAlgoToDom(this._algos[i]);
-            ctx = this._ui.getCtx(this._algos[i]);
-            this._algos[i].setup(ctx);
+        algos = TileGenerator.AlgoFactory.getAlgoInstances();
+        for (i = 0; i < algos.length; i += 1) {
+            this._ui.addAlgoToDom(algos[i]);
+            this._algos[algos[i].getId()] = algos[i];
         }
         this._ui.onLoadEnd();
     };
 
-    TileGenerator.Main.prototype.draw = function () {
-        var ctx,
-            i;
-        for (i = 0; i < this._algos.length; i += 1) {
-            ctx = this._ui.getCtx(this._algos[i]);
-            ctx.clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
-            this._algos[i].draw(ctx);
-        }
-    };
-
-    TileGenerator.Main.prototype.resized = function () {
-        var ctx,
-            i;
-        for (i = 0; i < this._algos.length; i += 1) {
-            ctx = this._ui.getCtx(this._algos[i]);
-            this._algos[i].resized(ctx);
-        }
+    TileGenerator.Main.prototype.getAlgo = function (algoId) {
+        return this._algos[algoId];
     };
 
     TileGenerator.Main.prototype.getSettings = function () {

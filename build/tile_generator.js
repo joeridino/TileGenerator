@@ -325,7 +325,7 @@ var TileGenerator = {};
     TileGenerator.Main = function () {
         this._settings = new TileGenerator.Settings();
         this._ui = new TileGenerator.Ui();
-        this._algos = null;
+        this._algos = {};
     };
 
     TileGenerator.Main.getRef = function () {
@@ -333,36 +333,20 @@ var TileGenerator = {};
     };
 
     TileGenerator.Main.prototype.onLoad = function () {
-        var ctx,
+        var algos,
             i;
         this._settings.onLoad();
         this._ui.onLoad();
-        this._algos = TileGenerator.AlgoFactory.getAlgoInstances();
-        for (i = 0; i < this._algos.length; i += 1) {
-            this._ui.addAlgoToDom(this._algos[i]);
-            ctx = this._ui.getCtx(this._algos[i]);
-            this._algos[i].setup(ctx);
+        algos = TileGenerator.AlgoFactory.getAlgoInstances();
+        for (i = 0; i < algos.length; i += 1) {
+            this._ui.addAlgoToDom(algos[i]);
+            this._algos[algos[i].getId()] = algos[i];
         }
         this._ui.onLoadEnd();
     };
 
-    TileGenerator.Main.prototype.draw = function () {
-        var ctx,
-            i;
-        for (i = 0; i < this._algos.length; i += 1) {
-            ctx = this._ui.getCtx(this._algos[i]);
-            ctx.clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
-            this._algos[i].draw(ctx);
-        }
-    };
-
-    TileGenerator.Main.prototype.resized = function () {
-        var ctx,
-            i;
-        for (i = 0; i < this._algos.length; i += 1) {
-            ctx = this._ui.getCtx(this._algos[i]);
-            this._algos[i].resized(ctx);
-        }
+    TileGenerator.Main.prototype.getAlgo = function (algoId) {
+        return this._algos[algoId];
     };
 
     TileGenerator.Main.prototype.getSettings = function () {
@@ -414,7 +398,7 @@ var TileGenerator = {};
         this._sizeElement.addEventListener('change', this._onChangeSize.bind(this));
         this._sizeElement.addEventListener('keyup', this._onKeySize.bind(this));
         this._addColorsFromSettings();
-        this._map = new TileGenerator.Map();
+        this._map = new TileGenerator.Map(this);
         this._map.onLoad();
     };
 
@@ -446,14 +430,11 @@ var TileGenerator = {};
         this._canvasList[algoId] = canvas;
         this._ctxList[algoId] = ctx;
         this._canvasesElement.appendChild(tpl);
+        algo.setup(ctx);
     };
 
-    TileGenerator.Ui.prototype.getCanvas = function (algo) {
-        return this._canvasList[algo.getId()];
-    };
-
-    TileGenerator.Ui.prototype.getCtx = function (algo) {
-        return this._ctxList[algo.getId()];
+    TileGenerator.Ui.prototype.redrawAlgo = function (algoId) {
+        this._redrawAlgo(algoId);
     };
 
     TileGenerator.Ui.prototype._onClickCanvas = function (e) {
@@ -559,7 +540,7 @@ var TileGenerator = {};
             this._settings.setWidth(size[0])
                 .setHeight(size[1]);
             this._resizeCanvases();
-            TileGenerator.Main.getRef().resized();
+            this._callAlgoResized();
             this._redraw();
         }
     };
@@ -573,7 +554,18 @@ var TileGenerator = {};
     };
 
     TileGenerator.Ui.prototype._redraw = function () {
-        TileGenerator.Main.getRef().draw();
+        var i;
+        for (i in this._ctxList) {
+            if (this._ctxList.hasOwnProperty(i)) {
+                this._redrawAlgo(i);
+            }
+        }
+    };
+
+    TileGenerator.Ui.prototype._redrawAlgo = function (algoId) {
+        var algo = TileGenerator.Main.getRef().getAlgo(algoId);
+        this._ctxList[algoId].clearRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
+        algo.draw(this._ctxList[algoId]);
     };
 
     TileGenerator.Ui.prototype._cloneColor = function (colorContainerElement) {
@@ -646,6 +638,17 @@ var TileGenerator = {};
         this._map.onResize();        
     };
 
+    TileGenerator.Ui.prototype._callAlgoResized = function () {
+        var algo,
+            i;
+        for (i in this._ctxList) {
+            if (this._ctxList.hasOwnProperty(i)) {
+                algo = TileGenerator.Main.getRef().getAlgo(i);
+                algo.resized(this._ctxList[i]);
+            }
+        }
+    };
+
     TileGenerator.Ui.prototype._populateSizes = function () {
         var i,
             matchedOption,
@@ -667,7 +670,8 @@ var TileGenerator = {};
 (function () {
     'use strict';
 
-    TileGenerator.Map = function () {
+    TileGenerator.Map = function (ui) {
+        this._ui = ui;
         this._settings = null;
         this._dimElement = null;
         this._mapElement = null;
@@ -677,10 +681,12 @@ var TileGenerator = {};
         this._previousElement = null;
         this._nextElement = null;
         this._closeElement = null;
+        this._redrawElement = null;
         this._closeHandler = this._onClickDim.bind(this);
         this._keyHandler = this._onKeyDocument.bind(this);
         this._previousHandler = this._onClickPrevious.bind(this);
         this._nextHandler = this._onClickNext.bind(this);
+        this._redrawHandler = this._onClickRedraw.bind(this);
     };
 
     TileGenerator.Map.NUM_X_TILES = 3;
@@ -693,8 +699,9 @@ var TileGenerator = {};
         this._previousElement = this._mapElement.querySelector('.tg-map-link-previous');
         this._nextElement = this._mapElement.querySelector('.tg-map-link-next');
         this._closeElement = this._mapElement.querySelector('.tg-map-link-close');
+        this._redrawElement = this._mapElement.querySelector('.tg-map-link-redraw');
         this._createCanvas();
-        this._reorderDom();
+        this._rearrangeDom();
     };
 
     TileGenerator.Map.prototype.onResize = function () {
@@ -715,6 +722,7 @@ var TileGenerator = {};
         this._previousElement.addEventListener('click', this._previousHandler);
         this._nextElement.addEventListener('click', this._nextHandler);
         this._closeElement.addEventListener('click', this._closeHandler);
+        this._redrawElement.addEventListener('click', this._redrawHandler);
     };
 
     TileGenerator.Map.prototype._hide = function () {
@@ -726,6 +734,7 @@ var TileGenerator = {};
         this._previousElement.removeEventListener('click', this._previousHandler);
         this._nextElement.removeEventListener('click', this._nextHandler);
         this._closeElement.removeEventListener('click', this._closeHandler);
+        this._redrawElement.removeEventListener('click', this._redrawHandler);
     };
 
     TileGenerator.Map.prototype._populate = function () {
@@ -777,6 +786,12 @@ var TileGenerator = {};
         e.preventDefault();
     };
 
+    TileGenerator.Map.prototype._onClickRedraw = function (e) {
+        this._ui.redrawAlgo(this._sourceCanvas.dataset.algoId);
+        this._draw();
+        e.preventDefault();
+    };
+
     TileGenerator.Map.prototype._changeCanvas = function (canvas) {
         this._sourceCanvas = canvas;
         this._populate();
@@ -814,7 +829,7 @@ var TileGenerator = {};
         this._mapCtx = this._mapCanvas.getContext('2d');
     };
 
-    TileGenerator.Map.prototype._reorderDom = function () {
+    TileGenerator.Map.prototype._rearrangeDom = function () {
         if (this._mapElement.parentNode === document.body) {
             return;
         }
