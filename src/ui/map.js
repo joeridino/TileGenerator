@@ -9,19 +9,20 @@
         this._mapCanvas = null;
         this._mapCtx = null;
         this._sourceCanvas = null;
+        this._pattern = null;
+        this._patterns = null;
         this._previousElement = null;
         this._nextElement = null;
         this._closeElement = null;
         this._redrawElement = null;
+        this._patternsElement = null;
         this._closeHandler = this._onClickDim.bind(this);
         this._keyHandler = this._onKeyDocument.bind(this);
         this._previousHandler = this._onClickPrevious.bind(this);
         this._nextHandler = this._onClickNext.bind(this);
         this._redrawHandler = this._onClickRedraw.bind(this);
+        this._patternHandler = this._onClickPattern.bind(this);
     };
-
-    TileGenerator.Map.NUM_X_TILES = 3;
-    TileGenerator.Map.NUM_Y_TILES = 3;
 
     TileGenerator.Map.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
@@ -31,13 +32,17 @@
         this._nextElement = this._mapElement.querySelector('.tg-map-link-next');
         this._closeElement = this._mapElement.querySelector('.tg-map-link-close');
         this._redrawElement = this._mapElement.querySelector('.tg-map-link-redraw');
+        this._patternsElement = this._mapElement.querySelector('.tg-map-patterns');
+        this._patterns = TileGenerator.MapPatternFactory.getPatternInstances();
+        this._pattern = this._patterns[0];
         this._createCanvas();
+        this._resize();
         this._rearrangeDom();
+        this._populateDomPatterns();
     };
 
     TileGenerator.Map.prototype.onResize = function () {
-        this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
-        this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
+        this._resize();
     };
 
     TileGenerator.Map.prototype.show = function (canvas) {
@@ -54,6 +59,7 @@
         this._nextElement.addEventListener('click', this._nextHandler);
         this._closeElement.addEventListener('click', this._closeHandler);
         this._redrawElement.addEventListener('click', this._redrawHandler);
+        this._addPatternListeners();
     };
 
     TileGenerator.Map.prototype._hide = function () {
@@ -66,6 +72,7 @@
         this._nextElement.removeEventListener('click', this._nextHandler);
         this._closeElement.removeEventListener('click', this._closeHandler);
         this._redrawElement.removeEventListener('click', this._redrawHandler);
+        this._removePatternListeners();
     };
 
     TileGenerator.Map.prototype._populate = function () {
@@ -75,9 +82,7 @@
     };
 
     TileGenerator.Map.prototype._draw = function () {
-        var pattern = this._mapCtx.createPattern(this._sourceCanvas, 'repeat');
-        this._mapCtx.fillStyle = pattern;
-        this._mapCtx.fillRect(0, 0, this._mapCanvas.width, this._mapCanvas.height);
+        this._pattern.draw(this._sourceCanvas, this._mapCtx);
     };
 
     TileGenerator.Map.prototype._position = function () {
@@ -123,6 +128,20 @@
         e.preventDefault();
     };
 
+    TileGenerator.Map.prototype._onClickPattern = function (e) {
+        var index;
+        if (e.target.classList.contains('tg-map-pattern-active')) {
+            return;
+        }
+        this._patternsElement.querySelector('.tg-map-pattern-active').classList.remove('tg-map-pattern-active');
+        index = TileGenerator.Dom.getSiblingIndex(e.target);
+        e.target.classList.add('tg-map-pattern-active');
+        this._pattern = this._patterns[index];
+        this._resize();
+        this._draw();
+        this._position();
+    };
+
     TileGenerator.Map.prototype._changeCanvas = function (canvas) {
         this._sourceCanvas = canvas;
         this._populate();
@@ -155,10 +174,13 @@
 
     TileGenerator.Map.prototype._createCanvas = function () {
         this._mapCanvas = document.getElementById('tg-map-canvas');
-        this._mapCanvas.width = this._settings.getWidth() * TileGenerator.Map.NUM_X_TILES;
-        this._mapCanvas.height = this._settings.getHeight() * TileGenerator.Map.NUM_Y_TILES;
         this._mapCtx = this._mapCanvas.getContext('2d');
     };
+
+    TileGenerator.Map.prototype._resize = function () {
+        this._mapCanvas.width = this._settings.getWidth() * this._pattern.getNumXTiles();
+        this._mapCanvas.height = this._settings.getHeight() * this._pattern.getNumYTiles();
+    }
 
     TileGenerator.Map.prototype._rearrangeDom = function () {
         if (this._mapElement.parentNode === document.body) {
@@ -168,5 +190,37 @@
         this._dimElement.parentNode.removeChild(this._dimElement);
         document.body.appendChild(this._mapElement);
         document.body.appendChild(this._dimElement);
+    };
+
+    TileGenerator.Map.prototype._populateDomPatterns = function () {
+        var i,
+            li,
+            ul = this._patternsElement.querySelector('ul');
+        for (i = 0; i < this._patterns.length; i += 1) {
+            li = document.createElement('li');
+            if (i === 0) {
+                li.classList.add('tg-map-pattern-active');
+            }
+            li.setAttribute('tabindex', '0');
+            li.setAttribute('title', this._patterns[i].getDescription());
+            li.textContent = this._patterns[i].getTitle();
+            ul.appendChild(li);
+        }
+    };
+
+    TileGenerator.Map.prototype._addPatternListeners = function () {
+        var i,
+            lis = this._patternsElement.querySelectorAll('li');
+        for (i = 0; i < lis.length; i += 1) {
+            lis[i].addEventListener('click', this._patternHandler);
+        }
+    };
+
+    TileGenerator.Map.prototype._removePatternListeners = function () {
+        var i,
+            lis = this._patternsElement.querySelectorAll('li');
+        for (i = 0; i < lis.length; i += 1) {
+            lis[i].removeEventListener('click', this._patternHandler);
+        }
     };
 }());
