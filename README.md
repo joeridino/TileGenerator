@@ -5,6 +5,6 @@ TileGenerator is a browser app that creates random and non-random 2D game tiles 
 * Mix and match colors with the browser's color picker.
 * Adjust color weights to make colors stand out or go away.
 * Choose the tile size you want (multiples of 32).
-* Map preview shows a 3x3 grid to see how the tiles stitch together.
+* Map preview shows different patterns to see how the tiles stitch together.
 * Tiles can be saved by right-clicking and choosing "Save Image As...".
 * All settings are saved in local storage -- next time you visit your colors and weights are the same (randomly generated images obviously get regenerated).
