@@ -1,4 +1,7 @@
 # TileGenerator
+v1.0.0
+
+## What is it?
 TileGenerator is a browser app that creates random and non-random 2D game tiles for you.  The outputted tiles in some cases may not stitch together without seams but some do.  They are meant as a starting point and should be edited in a paint program where necessary.
 
 ## Features

@@ -1,3 +1,4 @@
+// Copyright (c) 2016 Joe Ridino
 var TileGenerator = {};
 (function () {
     'use strict';

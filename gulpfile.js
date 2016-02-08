@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var header = require('gulp-header');
 
 var buildDir = 'build';
 var srcDir = 'src';
@@ -37,12 +38,19 @@ for (i = 0; i < jsFiles.length; i += 1) {
     jsFiles[i] = srcDir + '/' + jsFiles[i];
 }
 
+var pkg = require('./package.json');
+var banner = [
+    '// <%= pkg.custom.copyright %> <%= pkg.author.name %>',
+    ''
+].join('\n');
+
 // concat task
 gulp.task('jsConcat', function () {
     'use strict';
 
     gulp.src(jsFiles)
         .pipe(concat(outputFile))
+        .pipe(header(banner, {pkg: pkg}))
         .pipe(gulp.dest(buildDir));
 });
 
@@ -55,6 +63,7 @@ gulp.task('jsUglify', function () {
         .pipe(uglify().on('error', function (e) {
             console.log(e);
         }))
+        .pipe(header(banner, {pkg: pkg}))
         .pipe(gulp.dest(buildDir));
 });
 
@@ -64,11 +73,3 @@ gulp.task('watch', function () {
 
     gulp.watch([srcDir + '/**/*.js', '!' + buildDir + '/**'], ['jsConcat', 'jsUglify']);
 });
-
-gulp.task('scripts', ['clean'], function () {
-      return gulp.src('js/*.js')
-        .pipe(uglify().on('error', function(e){
-            console.log(e);
-         }))
-        .pipe(gulp.dest('minjs'));
-  });
