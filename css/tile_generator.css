@@ -160,3 +160,13 @@
         margin-left: 0px;
     }
 }
+
+@media (max-width: 400px) {
+    .tg-controls .tg-new-color button:not(:first-of-type) {
+        margin-left: 0;
+    }
+
+    .tg-controls .tg-colors .tg-color-container .tg-remove-color-btn {
+        margin-left: 0;
+    }
+}
