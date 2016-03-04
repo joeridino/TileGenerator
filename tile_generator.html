@@ -18,15 +18,21 @@
         </div>
         <div id="tg-controls" class="tg-controls">
             <h2 class="tg-title">Options</h2>
-                <div class="tg-new-color">
-                    <button id="tg-new-color-btn" type="button">Add Color</button>
+                <div class="tg-main-options">
+                    <h3>Misc.</h3>
+                    <div class="tg-size">
+                        <label for="tg-size">Size:</label>
+                        <select id="tg-size" name="size"></select>
+                    </div>
                     <button id="tg-redraw-btn" type="button">Redraw</button>
                 </div>
-                <div class="tg-size">
-                    <label for="size">Size:</label>
-                    <select id="tg-size" name="size"></select>
+                <div class="tg-colors">
+                    <h3>Colors</h3>
+                    <div class="tg-new-color">
+                        <button id="tg-new-color-btn" type="button">Add Color</button>
+                    </div>
+                    <div id="tg-colors-dynamic"></div>
                 </div>
-                <div id="tg-colors-dynamic" class="tg-colors"></div>
                 <div id="tg-color-container-template" class="tg-color-container-template">
                     <div class="tg-color-combo">
                         <input type="color" value="#000000" class="tg-color">
@@ -41,7 +47,13 @@
                       <button type="button" class="tg-clone-color-btn">Clone</button>
                       <button type="button" class="tg-remove-color-btn">Remove</button>
                   </div>
-            </div>
+                </div>
+                <div class="tg-file">
+                    <h3>Image File</h3>
+                    <input type="file" id="tg-file" accept="image/*">
+                    <input type="button" id="tg-file-remove" class="tg-file-remove" value="Remove">
+                    <img id="tg-file-preview" class="tg-file-preview">
+                </div>
             <div class="tg-clearfix"></div>
         </div>
         <div id="tg-map" class="tg-map">
@@ -57,6 +69,7 @@
                 <div class="tg-clearfix"></div>
             </div>
         </div>
+        <progress max="100" id="tg-progress" class="tg-progress"></progress>
         <div id="tg-dim" class="tg-dim"></div>
     </body>
 </html>

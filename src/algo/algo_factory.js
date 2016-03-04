@@ -9,7 +9,8 @@
             new TileGenerator.AlgoBrick(settings),
             new TileGenerator.AlgoNeighbor4(settings),
             new TileGenerator.AlgoNeighbor8(settings),
-            new TileGenerator.AlgoPixellation(settings)
+            new TileGenerator.AlgoPixellation(settings),
+            new TileGenerator.AlgoFilePixellation(settings)
         ];
     };
 }());

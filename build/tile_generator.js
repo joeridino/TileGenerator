@@ -195,6 +195,7 @@ var TileGenerator = {};
             100,
             100
         ];
+        this._imageElement = null;
     };
 
     TileGenerator.Settings.VERSION = '1.1';
@@ -294,6 +295,15 @@ var TileGenerator = {};
         return this;
     }
 
+    TileGenerator.Settings.prototype.getImageElement = function () {
+        return this._imageElement;
+    };
+
+    TileGenerator.Settings.prototype.setImageElement = function (imageElement) {
+        this._imageElement = imageElement;
+        return this;
+    };
+
     TileGenerator.Settings.prototype._saveSettings = function () {
         var settings;
         try {
@@ -366,8 +376,15 @@ var TileGenerator = {};
         this._settings = null;
         this._canvasList = {};
         this._ctxList = {};
+        this._canvasesContainerElement = null;
         this._canvasesElement = null;
         this._canvasContainerTplElement = null;
+        this._dimElement = null;
+        this._progressElement = null;
+        this._lastDropTarget = null;
+        this._fileElement = null;
+        this._fileRemoveElement = null;
+        this._filePreviewElement = null;
         this._colorsElement = null;
         this._newColorElement = null;
         this._colorContainerTplElement = null;
@@ -386,8 +403,20 @@ var TileGenerator = {};
 
     TileGenerator.Ui.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
+        this._canvasesContainerElement = document.getElementById('tg-canvases');
         this._canvasesElement = document.getElementById('tg-canvases-dynamic');
+        this._canvasesContainerElement.addEventListener('drop', this._onDropCanvases.bind(this));
+        this._canvasesContainerElement.addEventListener('dragenter', this._onDragEnterCanvases.bind(this));
+        this._canvasesContainerElement.addEventListener('dragover', this._onDragOverCanvases.bind(this));
+        this._canvasesContainerElement.addEventListener('dragleave', this._onDragLeaveCanvases.bind(this));
         this._canvasContainerTplElement = document.getElementById('tg-canvas-container-template');
+        this._dimElement = document.getElementById('tg-dim');
+        this._progressElement = document.getElementById('tg-progress');
+        this._fileElement = document.getElementById('tg-file');
+        this._fileRemoveElement = document.getElementById('tg-file-remove');
+        this._filePreviewElement = document.getElementById('tg-file-preview');
+        this._fileElement.addEventListener('change', this._onFileChange.bind(this));
+        this._fileRemoveElement.addEventListener('click', this._onFileRemove.bind(this));
         this._colorsElement = document.getElementById('tg-colors-dynamic');
         this._newColorElement = document.getElementById('tg-new-color-btn');
         this._newColorElement.addEventListener('click', this._onAddColor.bind(this));
@@ -450,6 +479,105 @@ var TileGenerator = {};
         if (e.which === 13) {
             this._map.show(e.target);
         }
+    };
+
+    TileGenerator.Ui.prototype._onDragEnterCanvases = function (e) {
+        this._lastDropTarget = e.target;
+        this._canvasesContainerElement.classList.add('tg-drop-effect');
+        e.preventDefault();
+    };
+
+    TileGenerator.Ui.prototype._onDragOverCanvases = function (e) {
+        e.preventDefault();
+    };
+
+    TileGenerator.Ui.prototype._onDragLeaveCanvases = function (e) {
+        if (this._lastDropTarget === e.target) {
+            this._canvasesContainerElement.classList.remove('tg-drop-effect');
+        }
+    };
+
+    TileGenerator.Ui.prototype._onDropCanvases = function (e) {
+        this._canvasesContainerElement.classList.remove('tg-drop-effect');
+        e.preventDefault();
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+            this._onNewFile(e.dataTransfer.files[0]);
+        }
+    };
+
+    TileGenerator.Ui.prototype._onFileChange = function (e) {
+        var validated = false;
+        if (!this._fileElement.value) {
+            return;
+        }
+        validated = this._onNewFile(this._fileElement.files[0]);
+        if (!validated) {
+            this._fileElement.value = null;
+        }
+    };
+
+    TileGenerator.Ui.prototype._onNewFile = function (file) {
+        var fileReader,
+            maxMbs = 1,
+            userMbs,
+            validateSize = false;
+        if (!/^image\//.test(file.type)) {
+            alert('Please upload an image file.');
+            return false;
+        }
+        if (validateSize) {
+            if (file.size > (1024 * 1024 * maxMbs)) {
+                userMbs = Math.round(file.size / (1024 * 1024));
+                alert('Image files should be no more than ' + maxMbs + 'MB in size.  Your file is ~' + userMbs + 'MB.');
+                return false;
+            }
+        }
+        this._showProgress();
+        fileReader = new FileReader();
+        fileReader.addEventListener('load', this._onFileLoad.bind(this));
+        fileReader.addEventListener('error', this._onFileError.bind(this));
+        fileReader.addEventListener('abort', this._onFileError.bind(this));
+        fileReader.readAsDataURL(file);
+        return true;
+    };
+
+    TileGenerator.Ui.prototype._onFileLoad = function (e) {
+        this._filePreviewElement.setAttribute('src', e.target.result);
+        this._filePreviewElement.style.display = 'block';
+        this._fileRemoveElement.style.display = 'block';
+        this._settings.setImageElement(this._filePreviewElement);
+        setTimeout(function () {
+            this._hideProgress();
+            this._redraw();
+        }.bind(this), 150);
+    };
+
+    TileGenerator.Ui.prototype._onFileError = function (e) {
+        this._hideProgress();
+        alert('There was an error loading your file.  Please try again.');
+    };
+
+    TileGenerator.Ui.prototype._onFileRemove = function (e) {
+        this._fileElement.value = null;
+        this._filePreviewElement.removeAttribute('src');
+        this._filePreviewElement.style.display = 'none';
+        this._fileRemoveElement.style.display = 'none';
+        this._settings.setImageElement(null);
+        this._redraw();
+    };
+
+    TileGenerator.Ui.prototype._showProgress = function () {
+        var progressRect;
+        this._dimElement.style.display = 'block';
+        this._progressElement.style.display = 'block';
+        progressRect = this._progressElement.getBoundingClientRect();
+        this._progressElement.style.left = Math.max(Math.floor((window.innerWidth - progressRect.width) / 2), 0) + 'px';
+        this._progressElement.style.top = Math.max(Math.floor((window.innerHeight - progressRect.height) / 2), 0) + 'px';
+    };
+
+    TileGenerator.Ui.prototype._hideProgress = function () {
+        this._dimElement.style.display = 'none';
+        this._progressElement.style.display = 'none';
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
@@ -1069,7 +1197,7 @@ var TileGenerator = {};
         this._imageDataArray[index++] = color[0];
         this._imageDataArray[index++] = color[1];
         this._imageDataArray[index++] = color[2];
-        this._imageDataArray[index++] = 255;
+        this._imageDataArray[index++] = (color[3] === undefined ? 255 : color[3]);
         this._imageDataModified = true;
     };
 
@@ -1454,15 +1582,12 @@ var TileGenerator = {};
     TileGenerator.Oop.extend(parent, TileGenerator.AlgoPixellation);
 
     TileGenerator.AlgoPixellation.prototype._setPixels = function (ctx) {
-        var blockColors,
-            blockY,
+        var blockY,
             blockX,
             colorIndex,
             colors = this._settings.getColors(),
             colorWeights = this._settings.getColorWeights(),
-            positions,
-            x,
-            y;
+            positions;
         this._blockWidth = Math.floor(this._settings.getWidth() / 8);
         this._blockHeight = Math.floor(this._settings.getHeight() / 8);
         this._numBlocksX = Math.ceil(this._settings.getWidth() / this._blockWidth);
@@ -1502,6 +1627,115 @@ var TileGenerator = {};
 (function () {
     'use strict';
 
+    var parent = TileGenerator.AlgoPixellation;
+
+    TileGenerator.AlgoFilePixellation = function (settings) {
+        parent.call(this, settings);
+        this._id = 'file_pixellation';
+        this._title = 'File Pixellation';
+        this._description = 'Blocks of pixels are assigned the same color based on the selected image file.';
+    };
+
+    TileGenerator.Oop.extend(parent, TileGenerator.AlgoFilePixellation);
+
+    TileGenerator.AlgoFilePixellation.prototype.draw = function (ctx) {
+        var imageElement = this._settings.getImageElement();
+        if (!imageElement) {
+            this._drawMissingImage(ctx);
+        } else {
+            this._drawImage(ctx);
+            this._pixellateImage(ctx);
+            this._drawPixels(ctx);
+        }
+    };
+
+    TileGenerator.AlgoFilePixellation.prototype._drawMissingImage = function (ctx) {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, this._settings.getWidth(), this._settings.getHeight());
+        if (!this._drawTextConditional(ctx, 'Need File')) {
+            this._drawTextConditional(ctx, 'File');
+        }
+    };
+
+    TileGenerator.AlgoFilePixellation.prototype._drawImage = function (ctx) {
+        var imageElement = this._settings.getImageElement();
+        ctx.drawImage(
+            imageElement,
+            0,
+            0,
+            imageElement.width,
+            imageElement.height,
+            0,
+            0,
+            this._settings.getWidth(),
+            this._settings.getHeight()
+        );
+    };
+
+    TileGenerator.AlgoFilePixellation.prototype._pixellateImage = function (ctx) {
+        var blockY,
+            blockX,
+            color,
+            imageData = ctx.getImageData(0, 0, this._settings.getWidth(), this._settings.getHeight()).data,
+            positions;
+        this._blockWidth = 4;
+        this._blockHeight = 4;
+        this._numBlocksX = Math.ceil(this._settings.getWidth() / this._blockWidth);
+        this._numBlocksY = Math.ceil(this._settings.getHeight() / this._blockHeight);
+        for (blockY = 0; blockY < this._numBlocksY; blockY += 1) {
+            for (blockX = 0; blockX < this._numBlocksX; blockX += 1) {
+                positions = this._getBlockPositions(blockX, blockY);
+                color = this._getBlockColor(ctx, imageData, positions);
+                this._setBlockPixels(ctx, positions, color);
+            }
+        }
+    };
+
+    TileGenerator.AlgoFilePixellation.prototype._drawTextConditional = function (ctx, text) {
+        var height = 16,
+            measurement,
+            x,
+            y;
+        ctx.font = 'bold ' + height + 'px serif';
+        ctx.textBaseline = 'top';
+        measurement = ctx.measureText(text);
+        if (measurement.width >= this._settings.getWidth()) {
+            return false;
+        }
+        x = Math.round((this._settings.getWidth() - measurement.width) / 2);
+        y = Math.round((this._settings.getHeight() - height) / 2);
+        ctx.fillStyle = 'white';
+        ctx.fillText(text, x, y);
+        return true;
+    };
+
+    TileGenerator.AlgoFilePixellation.prototype._getBlockColor = function (ctx, imageData, positions) {
+        var a = 0,
+            b = 0,
+            color,
+            g = 0,
+            i,
+            pixelIndex,
+            r = 0;
+        for (i = 0; i < positions.length; i += 1) {
+            pixelIndex = this._getPixelIndex(ctx, positions[i].x, positions[i].y);
+            r += imageData[pixelIndex++];
+            g += imageData[pixelIndex++];
+            b += imageData[pixelIndex++];
+            a += imageData[pixelIndex++];
+        }
+        color = [
+            Math.round(r / positions.length),
+            Math.round(g / positions.length),
+            Math.round(b / positions.length),
+            Math.round(a / positions.length)
+        ];
+        return color;
+    };
+}());
+(function () {
+    'use strict';
+
     TileGenerator.AlgoFactory = {};
 
     TileGenerator.AlgoFactory.getAlgoInstances = function () {
@@ -1510,7 +1744,8 @@ var TileGenerator = {};
             new TileGenerator.AlgoBrick(settings),
             new TileGenerator.AlgoNeighbor4(settings),
             new TileGenerator.AlgoNeighbor8(settings),
-            new TileGenerator.AlgoPixellation(settings)
+            new TileGenerator.AlgoPixellation(settings),
+            new TileGenerator.AlgoFilePixellation(settings)
         ];
     };
 }());

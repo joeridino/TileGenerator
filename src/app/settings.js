@@ -12,6 +12,7 @@
             100,
             100
         ];
+        this._imageElement = null;
     };
 
     TileGenerator.Settings.VERSION = '1.1';
@@ -110,6 +111,15 @@
         this._colorWeights.splice(index, 1);
         return this;
     }
+
+    TileGenerator.Settings.prototype.getImageElement = function () {
+        return this._imageElement;
+    };
+
+    TileGenerator.Settings.prototype.setImageElement = function (imageElement) {
+        this._imageElement = imageElement;
+        return this;
+    };
 
     TileGenerator.Settings.prototype._saveSettings = function () {
         var settings;

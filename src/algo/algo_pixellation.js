@@ -17,15 +17,12 @@
     TileGenerator.Oop.extend(parent, TileGenerator.AlgoPixellation);
 
     TileGenerator.AlgoPixellation.prototype._setPixels = function (ctx) {
-        var blockColors,
-            blockY,
+        var blockY,
             blockX,
             colorIndex,
             colors = this._settings.getColors(),
             colorWeights = this._settings.getColorWeights(),
-            positions,
-            x,
-            y;
+            positions;
         this._blockWidth = Math.floor(this._settings.getWidth() / 8);
         this._blockHeight = Math.floor(this._settings.getHeight() / 8);
         this._numBlocksX = Math.ceil(this._settings.getWidth() / this._blockWidth);

@@ -14,8 +14,20 @@
     z-index: 1000;
 }
 
+.tg-progress {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+}
+
+.tg-drop-effect {
+    background-image: url(../images/line-pattern.png);
+    background-repeat: repeat;
+}
+
 .tg-canvases canvas {
     cursor: pointer;
+    display: block;
 }
 
 .tg-canvases .tg-canvas-container-template {
@@ -40,25 +52,39 @@
     margin-top: 20px;
 }
 
+.tg-controls h3 {
+    margin-top: 0;
+}
+
 .tg-controls .tg-color-container-template {
     display: none;
 }
 
-.tg-controls .tg-new-color {
-    margin-top: 20px;
+.tg-controls .tg-colors .tg-new-color {
+    margin-bottom: 20px;
 }
 
-.tg-controls .tg-new-color button:not(:first-of-type) {
-    margin-left: 10px;
+.tg-controls .tg-size {
+    display: inline-block;
+    margin-right: 10px;
 }
 
-.tg-controls .tg-size,
+.tg-controls .tg-main-options,
+.tg-controls .tg-file,
 .tg-controls .tg-colors {
+    border: 1px solid #666;
     margin-top: 20px;
+    padding: 10px;
 }
 
-.tg-controls .tg-size label:not(:first-of-type) {
-    margin-left: 10px;
+.tg-controls .tg-file .tg-file-remove {
+    display: none;
+    margin-top: 10px;
+}
+
+.tg-controls .tg-file .tg-file-preview {
+    display: none;
+    margin-top: 10px;
 }
 
 .tg-controls .tg-colors .tg-color-container:not(:first-child) {
@@ -162,10 +188,6 @@
 }
 
 @media (max-width: 400px) {
-    .tg-controls .tg-new-color button:not(:first-of-type) {
-        margin-left: 0;
-    }
-
     .tg-controls .tg-colors .tg-color-container .tg-remove-color-btn {
         margin-left: 0;
     }

@@ -41,7 +41,7 @@
         this._imageDataArray[index++] = color[0];
         this._imageDataArray[index++] = color[1];
         this._imageDataArray[index++] = color[2];
-        this._imageDataArray[index++] = 255;
+        this._imageDataArray[index++] = (color[3] === undefined ? 255 : color[3]);
         this._imageDataModified = true;
     };
 

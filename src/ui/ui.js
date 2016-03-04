@@ -5,8 +5,15 @@
         this._settings = null;
         this._canvasList = {};
         this._ctxList = {};
+        this._canvasesContainerElement = null;
         this._canvasesElement = null;
         this._canvasContainerTplElement = null;
+        this._dimElement = null;
+        this._progressElement = null;
+        this._lastDropTarget = null;
+        this._fileElement = null;
+        this._fileRemoveElement = null;
+        this._filePreviewElement = null;
         this._colorsElement = null;
         this._newColorElement = null;
         this._colorContainerTplElement = null;
@@ -25,8 +32,20 @@
 
     TileGenerator.Ui.prototype.onLoad = function () {
         this._settings = TileGenerator.Main.getRef().getSettings();
+        this._canvasesContainerElement = document.getElementById('tg-canvases');
         this._canvasesElement = document.getElementById('tg-canvases-dynamic');
+        this._canvasesContainerElement.addEventListener('drop', this._onDropCanvases.bind(this));
+        this._canvasesContainerElement.addEventListener('dragenter', this._onDragEnterCanvases.bind(this));
+        this._canvasesContainerElement.addEventListener('dragover', this._onDragOverCanvases.bind(this));
+        this._canvasesContainerElement.addEventListener('dragleave', this._onDragLeaveCanvases.bind(this));
         this._canvasContainerTplElement = document.getElementById('tg-canvas-container-template');
+        this._dimElement = document.getElementById('tg-dim');
+        this._progressElement = document.getElementById('tg-progress');
+        this._fileElement = document.getElementById('tg-file');
+        this._fileRemoveElement = document.getElementById('tg-file-remove');
+        this._filePreviewElement = document.getElementById('tg-file-preview');
+        this._fileElement.addEventListener('change', this._onFileChange.bind(this));
+        this._fileRemoveElement.addEventListener('click', this._onFileRemove.bind(this));
         this._colorsElement = document.getElementById('tg-colors-dynamic');
         this._newColorElement = document.getElementById('tg-new-color-btn');
         this._newColorElement.addEventListener('click', this._onAddColor.bind(this));
@@ -89,6 +108,105 @@
         if (e.which === 13) {
             this._map.show(e.target);
         }
+    };
+
+    TileGenerator.Ui.prototype._onDragEnterCanvases = function (e) {
+        this._lastDropTarget = e.target;
+        this._canvasesContainerElement.classList.add('tg-drop-effect');
+        e.preventDefault();
+    };
+
+    TileGenerator.Ui.prototype._onDragOverCanvases = function (e) {
+        e.preventDefault();
+    };
+
+    TileGenerator.Ui.prototype._onDragLeaveCanvases = function (e) {
+        if (this._lastDropTarget === e.target) {
+            this._canvasesContainerElement.classList.remove('tg-drop-effect');
+        }
+    };
+
+    TileGenerator.Ui.prototype._onDropCanvases = function (e) {
+        this._canvasesContainerElement.classList.remove('tg-drop-effect');
+        e.preventDefault();
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+            this._onNewFile(e.dataTransfer.files[0]);
+        }
+    };
+
+    TileGenerator.Ui.prototype._onFileChange = function (e) {
+        var validated = false;
+        if (!this._fileElement.value) {
+            return;
+        }
+        validated = this._onNewFile(this._fileElement.files[0]);
+        if (!validated) {
+            this._fileElement.value = null;
+        }
+    };
+
+    TileGenerator.Ui.prototype._onNewFile = function (file) {
+        var fileReader,
+            maxMbs = 1,
+            userMbs,
+            validateSize = false;
+        if (!/^image\//.test(file.type)) {
+            alert('Please upload an image file.');
+            return false;
+        }
+        if (validateSize) {
+            if (file.size > (1024 * 1024 * maxMbs)) {
+                userMbs = Math.round(file.size / (1024 * 1024));
+                alert('Image files should be no more than ' + maxMbs + 'MB in size.  Your file is ~' + userMbs + 'MB.');
+                return false;
+            }
+        }
+        this._showProgress();
+        fileReader = new FileReader();
+        fileReader.addEventListener('load', this._onFileLoad.bind(this));
+        fileReader.addEventListener('error', this._onFileError.bind(this));
+        fileReader.addEventListener('abort', this._onFileError.bind(this));
+        fileReader.readAsDataURL(file);
+        return true;
+    };
+
+    TileGenerator.Ui.prototype._onFileLoad = function (e) {
+        this._filePreviewElement.setAttribute('src', e.target.result);
+        this._filePreviewElement.style.display = 'block';
+        this._fileRemoveElement.style.display = 'block';
+        this._settings.setImageElement(this._filePreviewElement);
+        setTimeout(function () {
+            this._hideProgress();
+            this._redraw();
+        }.bind(this), 150);
+    };
+
+    TileGenerator.Ui.prototype._onFileError = function (e) {
+        this._hideProgress();
+        alert('There was an error loading your file.  Please try again.');
+    };
+
+    TileGenerator.Ui.prototype._onFileRemove = function (e) {
+        this._fileElement.value = null;
+        this._filePreviewElement.removeAttribute('src');
+        this._filePreviewElement.style.display = 'none';
+        this._fileRemoveElement.style.display = 'none';
+        this._settings.setImageElement(null);
+        this._redraw();
+    };
+
+    TileGenerator.Ui.prototype._showProgress = function () {
+        var progressRect;
+        this._dimElement.style.display = 'block';
+        this._progressElement.style.display = 'block';
+        progressRect = this._progressElement.getBoundingClientRect();
+        this._progressElement.style.left = Math.max(Math.floor((window.innerWidth - progressRect.width) / 2), 0) + 'px';
+        this._progressElement.style.top = Math.max(Math.floor((window.innerHeight - progressRect.height) / 2), 0) + 'px';
+    };
+
+    TileGenerator.Ui.prototype._hideProgress = function () {
+        this._dimElement.style.display = 'none';
+        this._progressElement.style.display = 'none';
     };
 
     TileGenerator.Ui.prototype._onAddColor = function (e) {
